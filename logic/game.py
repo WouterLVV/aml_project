@@ -21,7 +21,7 @@ class Hearts:
         self.first_player = round.finish()
         self.history.append(round)
         if verbose:
-            print("Starting player: " + str(round.players[round.first_player_id]) + ". -- Cards played: " + str(["{}: {}".format(round.players[i].name, round.cards[i]) for i in range(len(round.players))]))
+            print("Starting player: " + str(round.players[round.first_player_id]) + ". -- Cards played: " + ", ".join(["{}: {}".format(round.players[i].name, round.cards[i]) for i in range(len(round.players))]))
 
 
     def finish(self, verbose=False):

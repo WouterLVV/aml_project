@@ -19,4 +19,4 @@ def four_random():
         game.play_round(verbose=True)
     game.finish(verbose=True)
 
-four_random()
+one_human_three_random()

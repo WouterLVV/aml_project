@@ -73,11 +73,18 @@ class HumanPlayer(Agent):
         else:
             self.name = "Henk" + str(random.randrange(0,1000))
 
+    def receive_hand(self, cards):
+        cards.sort()
+        super(HumanPlayer, self).receive_hand(cards)
 
     def pick_card(self, table):
-        print("Current table: " + str(["{}: {}".format(table.players[i].name, table.cards[i]) for i in range(len(table.players))]))
-        print("Player that started round: " + table.players[table.first_player].name)
-        print("Your hand: " + str(["{}: {}".format(i, card) for i,card in enumerate(self.hand)]))
+        print("\n-------------------------\n")
+        print("Current table: ")
+        print("\n".join(["{}: {}".format(table.players[i].name, table.cards[i]) for i in range(len(table.players))]))
+        print()
+        print("Player that started round: " + table.players[table.first_player_id].name)
+        print("Requested Suit: " + str(table.first_suit))
+        print("Your hand: " + ", ".join(["{}: {}".format(i, card) for i,card in enumerate(self.hand)]))
         s = input(self.name + ", Choose card to play: ")
         card = self.hand[int(s)]
         return card
