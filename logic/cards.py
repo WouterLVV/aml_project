@@ -29,6 +29,19 @@ class Suit(IntEnum):
             8: "BLACK",
         }[self.value]
 
+    def ascii_str(self):
+        return {
+            0: "",
+            1: "D",
+            2: "C",
+            3: "H",
+            4: "S",
+            5: "R",
+            6: "G",
+            7: "B",
+            8: "K",
+        }[self.value]
+
 
 class Rank(IntEnum):
     DOG = 0
@@ -80,6 +93,9 @@ class Card:
         self.suit = suit
         self.rank = rank
         self.compare_suit = compare_suit
+
+    def ascii_str(self):
+        return str(self.rank) + self.suit.ascii_str()
 
     def __str__(self):
         return str(self.rank) + str(self.suit)
