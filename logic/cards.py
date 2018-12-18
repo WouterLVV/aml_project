@@ -214,11 +214,11 @@ class Deck:
         return handlist
 
     @staticmethod
-    def gen_default(min_suit=1, max_suit=4, min_rank=2, max_rank=14, allow_duplicates=False):
+    def gen_default(min_suit=1, max_suit=4, min_rank=2, max_rank=14, card_class=Card, allow_duplicates=False):
         max_suit += 1
         max_rank += 1
 
-        return Deck([Card(Suit(a), Rank(b)) for a in range(min_suit, max_suit) for b in range(min_rank, max_rank)],
+        return Deck([card_class(Suit(a), Rank(b)) for a in range(min_suit, max_suit) for b in range(min_rank, max_rank)],
                     allow_duplicates=allow_duplicates)
 
     @staticmethod
