@@ -29,6 +29,12 @@ class Hearts:
             if verbose:
                 print("{} got {} points!".format(player.name, score))
 
+    def play_game(self):
+        num_rounds = len(self.deck) // self.players
+        for i in range(num_rounds):
+            self.play_round()
+        self.finish()
+
 
 class Round:
     def __init__(self, players, first_player_id):
