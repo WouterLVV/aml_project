@@ -192,7 +192,7 @@ class Deck:
             position = len(self.cardlist)
         self.cardlist.insert(position, card)
 
-    def deal(self, hands=4, cards=-1, shuffled=True, equal_size=True):
+    def deal(self, hands=4, cards=-1, shuffled=True, equal_size=True, destructive=True):
         if (shuffled):
             self.shuffle()
 
@@ -209,7 +209,8 @@ class Deck:
             for card in hand:
                 self.cardmap[card] -= 1
 
-        self.cardlist = restlist
+        if destructive:
+            self.cardlist = restlist
 
         return handlist
 
