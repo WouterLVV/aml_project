@@ -2,7 +2,6 @@ from logic.cards import STANDARDDECK, Suit, Rank, Card, Deck, TWOOFCLUBS
 
 
 class Hearts:
-
     def __init__(self, players, deck=STANDARDDECK):
         self.players = players
         self.deck = deck
@@ -24,14 +23,11 @@ class Hearts:
             print("Starting player: " + str(round.players[round.first_player_id]) + ". -- Cards played: " + ", ".join(["{}: {}".format(round.players[i].name, round.cards[i]) for i in range(len(round.players))]))
         return round
 
-
     def finish(self, verbose=False):
         for player in self.players:
             score = player.end_game()
             if verbose:
                 print("{} got {} points!".format(player.name, score))
-
-
 
 
 class Round:

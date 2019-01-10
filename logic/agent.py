@@ -36,7 +36,6 @@ class Agent:
             if card == QUEENOFSPADES:
                 self.points += 13
 
-
     def make_move(self, table):
         card = self.pick_card(table)
         assert self.check_valid(card,table)
