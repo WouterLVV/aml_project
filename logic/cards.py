@@ -233,6 +233,6 @@ class Deck:
 
 
 STANDARDDECK = Deck.gen_default()
-STANDARDDECKORDER = dict([(b,a) for a,b in enumerate(STANDARDDECK.cardlist)])
-
+CARD2NUM = dict([(b,a) for a,b in enumerate(STANDARDDECK.cardlist)])
+NUM2CARD = dict([(a,b) for a,b in enumerate(STANDARDDECK.cardlist)])
 TICHUDECK = Deck.gen_tichu()
