@@ -131,6 +131,14 @@ class HeartsSpectator(Frame,Hearts):
 
             place_scale = 0.4
 
+            # ----------------------------
+
+            handsize = len(round.hands[i])
+            
+
+
+            # ----------------------------
+
             x = ((math.sin(dist*i)+1)/2)*place_scale + (1-place_scale)/2
             y = ((math.cos(dist*i)+1)/2)*place_scale + (1-place_scale)/2
 

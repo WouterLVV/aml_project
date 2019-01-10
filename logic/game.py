@@ -42,8 +42,12 @@ class Round:
         self.num = len(players)
         self.first_suit = None
         self.hands = [None]*self.num
+        self.discardpiles = [None]*self.num
         for i in range(self.num):
             self.hands[i] = self.players[i].hand[:]
+            self.discardpiles[i] = self.players[i].played[:]
+
+
 
     def play(self):
         for i in range(self.num):

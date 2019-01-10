@@ -43,6 +43,7 @@ class Agent:
         self.hand.remove(card)
         self.suit_counter[card.suit] -= 1
         self.cardset.remove(card)
+        self.played.append(card)
         if card == TWOOFCLUBS:
             self.have_two_of_clubs = False
         return card
