@@ -41,6 +41,9 @@ class Round:
         self.cards = [None]*len(players)
         self.num = len(players)
         self.first_suit = None
+        self.hands = [None]*self.num
+        for i in range(self.num):
+            self.hands[i] = self.players[i].hand[:]
 
     def play(self):
         for i in range(self.num):
@@ -58,4 +61,7 @@ class Round:
                 winner = i
                 highestcard = self.cards[i]
         self.players[winner].win_cards(self.cards[:])
+        self.scores = [None]*self.num
+        for i in range(self.num):
+            self.scores[i] = self.players[i].points
         return winner

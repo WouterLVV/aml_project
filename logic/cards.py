@@ -89,7 +89,7 @@ class DuplicateCardError(Exception):
 
 
 class Card:
-    def __init__(self, suit, rank, compare_suit=False):
+    def __init__(self, suit, rank, compare_suit=True):
         self.suit = suit
         self.rank = rank
         self.compare_suit = compare_suit
@@ -224,7 +224,7 @@ class Deck:
 
     @staticmethod
     def gen_tichu():
-        deck = Deck([Card(Suit(a), Rank(b)) for a in range(5, 9) for b in range(2, 15)], allow_duplicates=False)
+        deck = Deck([Card(Suit(a), Rank(b), compare_suit=True) for a in range(5, 9) for b in range(2, 15)], allow_duplicates=False)
         deck.put(Card(Suit.NONE, Rank.ONE))
         deck.put(Card(Suit.NONE, Rank.DOG))
         deck.put(Card(Suit.NONE, Rank.CHICKEN))
@@ -233,5 +233,6 @@ class Deck:
 
 
 STANDARDDECK = Deck.gen_default()
+STANDARDDECKORDER = dict([(b,a) for a,b in enumerate(STANDARDDECK.cardlist)])
 
 TICHUDECK = Deck.gen_tichu()

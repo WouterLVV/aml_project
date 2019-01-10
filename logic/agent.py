@@ -30,6 +30,11 @@ class Agent:
 
     def win_cards(self,cards):
         self.won_cards.extend(cards)
+        for card in cards:
+            if card.suit == Suit.HEARTS:
+                self.points += 1
+            if card == QUEENOFSPADES:
+                self.points += 13
 
 
     def make_move(self, table):
@@ -55,11 +60,12 @@ class Agent:
         return valid
 
     def end_game(self):
-        for card in self.won_cards:
-            if card.suit == Suit.HEARTS:
-                self.points += 1
-            if card == QUEENOFSPADES:
-                self.points += 13
+        # # MOVED TO win_cards
+        # for card in self.won_cards:
+        #     if card.suit == Suit.HEARTS:
+        #         self.points += 1
+        #     if card == QUEENOFSPADES:
+        #         self.points += 13
         return self.points
 
 import random
