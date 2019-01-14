@@ -38,7 +38,8 @@ class Agent:
 
     def make_move(self, table):
         card = self.pick_card(table)
-        assert self.check_valid(card,table)
+        if not self.check_valid(card,table):
+            self.points += 1000
         self.hand.remove(card)
         self.suit_counter[card.suit] -= 1
         self.cardset.remove(card)
