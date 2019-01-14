@@ -40,15 +40,16 @@ class Hearts:
 class Round:
     def __init__(self, players, first_player_id):
         self.first_player_id = first_player_id
-        self.players = players # 4 lang
-        self.cards = [None]*len(players) # 4 lang
+        self.players = players
+        self.cards = [None]*len(players)
         self.num = len(players)
-        self.first_suit = None # card
-        self.hands = [None]*self.num # 4x(13-k)
-        self.discardpiles = [None]*self.num # 4xk
+        self.first_suit = None
+        self.hands = [None]*self.num
+        self.discardpiles = [None]*self.num
         for i in range(self.num):
             self.hands[i] = self.players[i].hand[:]
             self.discardpiles[i] = self.players[i].played[:]
+        # TODO Maak functie die self.rewards uitrekent
 
     def play(self):
         for i in range(self.num):
