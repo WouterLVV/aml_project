@@ -239,6 +239,13 @@ NUM2CARD = dict([(a,b) for a,b in enumerate(STANDARDDECK.cardlist)])
 TICHUDECK = Deck.gen_tichu()
 
 
+def suits_to_vector(suits):
+    vector = np.zeros((5,), dtype=np.bool)
+    for suit in suits:
+        vector[suit.value] = 1
+    return vector
+
+
 def cards_to_vector(cards):
     vector = np.zeros((52,), dtype=np.bool)
     for i in cards:
