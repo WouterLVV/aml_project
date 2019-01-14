@@ -8,7 +8,7 @@ class Hearts:
         self.history = []
         num_players = len(players)
 
-        hands = deck.deal(num_players)
+        hands = deck.deal(num_players, destructive=False)
         for i, cards in enumerate(hands):
             self.players[i].receive_hand(cards)
             if TWOOFCLUBS in cards:
@@ -42,7 +42,7 @@ class Round:
         self.players = players
         self.cards = [None]*len(players)
         self.num = len(players)
-        self.first_suit = None
+        self.first_suit = Suit.NONE
         self.hands = [None]*self.num
         self.discardpiles = [None]*self.num
         for i in range(self.num):
@@ -54,9 +54,9 @@ class Round:
             player_id = (i + self.first_player_id) % self.num
             card = self.players[player_id].make_move(self)
             self.cards[player_id] = card
-            if self.first_suit is None:
+            if self.first_suit is Suit.NONE:
                 self.first_suit = card.suit
-        assert self.first_suit is not None
+        assert self.first_suit is not None and not Suit.NONE
 
     def finish(self):
         highestcard = -1

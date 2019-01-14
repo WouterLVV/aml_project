@@ -54,7 +54,7 @@ class Agent:
     def check_valid(self, card, table):
         valid = True
         valid &= card in self.cardset
-        if table.first_suit is not None:
+        if table.first_suit is not Suit.NONE:
             valid &= (card.suit == table.first_suit if self.suit_counter[table.first_suit] > 0 else True)
         valid &= self.have_two_of_clubs == (card == TWOOFCLUBS)
         return valid
