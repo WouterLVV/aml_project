@@ -59,6 +59,13 @@ class Agent:
         valid &= self.have_two_of_clubs == (card == TWOOFCLUBS)
         return valid
 
+    def determine_valid_options(self, hand, table):
+        valid_options=[]
+        for i in self.hand:
+            if self.check_valid(i, table)== True:
+                valid_options.append(i)
+        return valid_options
+
     def end_game(self):
         # # MOVED TO win_cards
         # for card in self.won_cards:

@@ -1,4 +1,5 @@
 from enum import IntEnum
+import numpy as np
 
 
 def szudzik(a, b):
@@ -236,3 +237,18 @@ STANDARDDECK = Deck.gen_default()
 CARD2NUM = dict([(b,a) for a,b in enumerate(STANDARDDECK.cardlist)])
 NUM2CARD = dict([(a,b) for a,b in enumerate(STANDARDDECK.cardlist)])
 TICHUDECK = Deck.gen_tichu()
+
+
+def cards_to_vector(self, cards):
+    vector = np.zeros((52,), dtype=np.bool)
+    for i in cards:
+        vector[CARD2NUM[i]] = 1
+    return vector
+
+
+def vector_to_cards(self, vector):
+    cards = []
+    for i in vector:
+        if i == 1:
+            cards.append(NUM2CARD[i])
+    return cards
