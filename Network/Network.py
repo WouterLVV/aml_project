@@ -2,7 +2,7 @@ import tensorflow as tf
 
 
 class DQNetwork:
-    '''
+    """"
     Neural network
     -----------------------
     inputs:
@@ -15,7 +15,7 @@ class DQNetwork:
     outputs:
         self.output; Calculate [Q(s'_1,a_1),...Q(s'_n,a_n)] with s'_i is the state after applying a_i on given input state s
         self.loss; norm 2 error function on Qhat-hat with Qhat = r + gamma*max_{a\inA} Q(s',a) where A is the set of possible action and s' the state after a round.
-    '''
+    """
     def __init__(self, state_size, action_size, hidden_sizes, layer_activation_functions, learning_rate, name='DQNetwork'):
         self.state_size = state_size
         self.action_size = action_size
@@ -34,7 +34,7 @@ class DQNetwork:
 
         with tf.variable_scope(name):
             self.inputs_ = tf.placeholder(tf.float32, [None, self.state_size], name="inputs")
-            self.actions_ = tf.placeholder(tf.float32, [None, self.action_size], name="actions_")
+            self.action_ = tf.placeholder(tf.float32, [None, self.action_size], name="actions_")
             self.target_Q = tf.placeholder(tf.float32, [None], name="target")
 
             input_ = self.inputs_
@@ -56,7 +56,7 @@ class DQNetwork:
             self.output = input_
 
             # Q is our predicted Q value.
-            self.Q = tf.reduce_sum(tf.multiply(self.output, self.actions_))
+            self.Q = tf.reduce_sum(tf.multiply(self.output, self.action_))
 
             # The loss is the difference between our predicted Q_values and the Q_target
             # Sum(Qtarget - Q)^2

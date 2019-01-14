@@ -15,13 +15,13 @@ class Hearts:
                 self.first_player = i
 
     def play_round(self, verbose=False):
-        round = Round(self.players, self.first_player)
-        round.play()
-        self.first_player = round.finish()
-        self.history.append(round)
+        round_ = Round(self.players, self.first_player)
+        round_.play()
+        self.first_player = round_.finish()
+        self.history.append(round_)
         if verbose:
-            print("Starting player: " + str(round.players[round.first_player_id]) + ". -- Cards played: " + ", ".join(["{}: {}".format(round.players[i].name, round.cards[i]) for i in range(len(round.players))]))
-        return round
+            print("Starting player: " + str(round_.players[round_.first_player_id]) + ". -- Cards played: " + ", ".join(["{}: {}".format(round_.players[i].name, round_.cards[i]) for i in range(len(round_.players))]))
+        return round_
 
     def finish(self, verbose=False):
         for player in self.players:
@@ -48,8 +48,6 @@ class Round:
         for i in range(self.num):
             self.hands[i] = self.players[i].hand[:]
             self.discardpiles[i] = self.players[i].played[:]
-
-
 
     def play(self):
         for i in range(self.num):

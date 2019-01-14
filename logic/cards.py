@@ -143,8 +143,8 @@ class Card:
 QUEENOFSPADES = Card(Suit.SPADES, Rank.QUEEN)
 TWOOFCLUBS = Card(Suit.CLUBS, Rank.TWO)
 
-class Deck:
 
+class Deck:
     def __init__(self, cardlist, allow_duplicates=False):
         self.allow_duplicates = allow_duplicates
         self.cardlist = cardlist
