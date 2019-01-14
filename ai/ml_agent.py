@@ -25,6 +25,3 @@ class ml_agent(Agent):
             card = NUM2CARD(choice)
         return card
 
-
-
-

@@ -216,3 +216,5 @@ pip-selfcheck.json
 
 *.conf
 .idea/aml_project.iml
+.idea/
+.idea/*
