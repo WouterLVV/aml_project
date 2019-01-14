@@ -248,7 +248,7 @@ def cards_to_vector(cards):
 
 def vector_to_cards(vector):
     cards = []
-    for i in vector:
-        if i == 1:
+    for i,v in enumerate(vector):
+        if v == 1:
             cards.append(NUM2CARD[i])
     return cards
