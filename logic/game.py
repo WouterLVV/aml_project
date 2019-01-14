@@ -6,6 +6,7 @@ class Hearts:
         self.players = players
         self.deck = deck
         self.history = []
+        self.broken = False
         num_players = len(players)
 
         hands = deck.deal(num_players)
@@ -56,6 +57,8 @@ class Round:
             self.cards[player_id] = card
             if self.first_suit is None:
                 self.first_suit = card.suit
+            if self.broken == False and self.first_suit != 3 and card.suit == 3:
+                self.broken = True
         assert self.first_suit is not None
 
     def finish(self):
