@@ -29,9 +29,9 @@ def many_games():
             game.play_round(verbose=False)
         game.finish(verbose=False)
 
-# starttime = time.perf_counter_ns()
-# many_games()
-# endtime = time.perf_counter_ns()
-# print((endtime-starttime)/1000000000)
+starttime = time.perf_counter_ns()
+many_games()
+endtime = time.perf_counter_ns()
+print((endtime-starttime)/1000000000)
 
-four_random()
+# four_random()

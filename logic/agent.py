@@ -38,7 +38,8 @@ class Agent:
 
     def make_move(self, table):
         card = self.pick_card(table)
-        assert self.check_valid(card,table)
+        if not self.check_valid(card,table):
+            self.points += 1000
         self.hand.remove(card)
         self.suit_counter[card.suit] -= 1
         self.cardset.remove(card)
@@ -54,8 +55,10 @@ class Agent:
     def check_valid(self, card, table):
         valid = True
         valid &= card in self.cardset
-        if table.first_suit is not None:
+        if table.first_suit is not Suit.NONE:
             valid &= (card.suit == table.first_suit if self.suit_counter[table.first_suit] > 0 else True)
+        if self.suit_counter[Suit.HEARTS] < len(self.hand) and not table.broken and table.first_suit == Suit.NONE:
+            valid &= card.suit != Suit.HEARTS
         valid &= self.have_two_of_clubs == (card == TWOOFCLUBS)
         return valid
 

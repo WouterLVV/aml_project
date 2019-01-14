@@ -9,17 +9,18 @@ class Hearts:
         self.broken = False
         num_players = len(players)
 
-        hands = deck.deal(num_players)
+        hands = deck.deal(num_players, destructive=False)
         for i, cards in enumerate(hands):
             self.players[i].receive_hand(cards)
             if TWOOFCLUBS in cards:
                 self.first_player = i
 
     def play_round(self, verbose=False):
-        round_ = Round(self.players, self.first_player)
+        round_ = Round(self.players, self.first_player, self.broken)
         round_.play()
         self.first_player = round_.finish()
         self.history.append(round_)
+        self.broken = round_.broken
         if verbose:
             print("Starting player: " + str(round_.players[round_.first_player_id]) + ". -- Cards played: " + ", ".join(["{}: {}".format(round_.players[i].name, round_.cards[i]) for i in range(len(round_.players))]))
         return round_
@@ -38,10 +39,11 @@ class Hearts:
 
 
 class Round:
-    def __init__(self, players, first_player_id):
+    def __init__(self, players, first_player_id, broken):
         self.first_player_id = first_player_id
-        self.players = players
-        self.cards = [None]*len(players)
+        self.broken = broken
+        self.players = players # 4 lang
+        self.cards = [None]*len(players) # 4 lang
         self.num = len(players)
         self.first_suit = None
         self.hands = [None]*self.num
@@ -56,11 +58,13 @@ class Round:
             player_id = (i + self.first_player_id) % self.num
             card = self.players[player_id].make_move(self)
             self.cards[player_id] = card
-            if self.first_suit is None:
+            if self.first_suit is Suit.NONE:
                 self.first_suit = card.suit
-            if self.broken == False and self.first_suit != 3 and card.suit == 3:
-                self.broken = True
-        assert self.first_suit is not None
+            self.broken |= self.first_suit != Suit.HEARTS and card.suit == Suit.HEARTS
+        assert self.first_suit is not None and not Suit.NONE
+
+
+
 
     def finish(self):
         highestcard = -1
