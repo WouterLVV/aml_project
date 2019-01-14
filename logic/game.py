@@ -6,6 +6,7 @@ class Hearts:
         self.players = players
         self.deck = deck
         self.history = []
+        self.broken = False
         num_players = len(players)
 
         hands = deck.deal(num_players, destructive=False)
@@ -15,10 +16,11 @@ class Hearts:
                 self.first_player = i
 
     def play_round(self, verbose=False):
-        round_ = Round(self.players, self.first_player)
+        round_ = Round(self.players, self.first_player, self.broken)
         round_.play()
         self.first_player = round_.finish()
         self.history.append(round_)
+        self.broken = round_.broken
         if verbose:
             print("Starting player: " + str(round_.players[round_.first_player_id]) + ". -- Cards played: " + ", ".join(["{}: {}".format(round_.players[i].name, round_.cards[i]) for i in range(len(round_.players))]))
         return round_
@@ -37,8 +39,9 @@ class Hearts:
 
 
 class Round:
-    def __init__(self, players, first_player_id):
+    def __init__(self, players, first_player_id, broken):
         self.first_player_id = first_player_id
+        self.broken = broken
         self.players = players
         self.cards = [None]*len(players)
         self.num = len(players)
@@ -56,7 +59,11 @@ class Round:
             self.cards[player_id] = card
             if self.first_suit is Suit.NONE:
                 self.first_suit = card.suit
+            self.broken |= self.first_suit != Suit.HEARTS and card.suit == Suit.HEARTS
         assert self.first_suit is not None and not Suit.NONE
+
+
+
 
     def finish(self):
         highestcard = -1

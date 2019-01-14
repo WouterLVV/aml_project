@@ -56,6 +56,8 @@ class Agent:
         valid &= card in self.cardset
         if table.first_suit is not Suit.NONE:
             valid &= (card.suit == table.first_suit if self.suit_counter[table.first_suit] > 0 else True)
+        if self.suit_counter[Suit.HEARTS] < len(self.hand) and not table.broken and table.first_suit == Suit.NONE:
+            valid &= card.suit != Suit.HEARTS
         valid &= self.have_two_of_clubs == (card == TWOOFCLUBS)
         return valid
 
