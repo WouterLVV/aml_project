@@ -239,14 +239,14 @@ NUM2CARD = dict([(a,b) for a,b in enumerate(STANDARDDECK.cardlist)])
 TICHUDECK = Deck.gen_tichu()
 
 
-def cards_to_vector(self, cards):
+def cards_to_vector(cards):
     vector = np.zeros((52,), dtype=np.bool)
     for i in cards:
         vector[CARD2NUM[i]] = 1
     return vector
 
 
-def vector_to_cards(self, vector):
+def vector_to_cards(vector):
     cards = []
     for i in vector:
         if i == 1:
