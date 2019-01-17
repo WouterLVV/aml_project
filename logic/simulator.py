@@ -7,7 +7,7 @@ from logic.cards import cards_to_vector, suits_to_vector, Suit
 class Simulator:
     def __init__(self, players, number_of_games_per_cycle, number_of_update_cycles, neural_network, update_rate):
         self.players = players
-        self.number_of_update_cyles = number_of_update_cycles
+        self.number_of_update_cycles = number_of_update_cycles
         self.number_of_games = number_of_games_per_cycle
         self.neural_network = neural_network
         self.played_games = []
@@ -22,7 +22,7 @@ class Simulator:
 
     def run_cycles(self):
         with tf.Session() as sess:
-            for _ in range(self.number_of_update_cyles):
+            for _ in range(self.number_of_update_cycles):
                 self.run_games()
                 history = self.collect_histories()
                 self.reset_games()
