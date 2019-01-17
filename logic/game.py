@@ -51,10 +51,13 @@ class Round:
         self.discardpiles = [None]*self.num
         self.scores = [None]*self.num
         self.rewards = [None]*self.num
+        self.combined_discardpile = []
+
         for i in range(self.num):
             self.hands[i] = self.players[i].hand[:]
             self.discardpiles[i] = self.players[i].played[:]
             self.scores[i] = self.players[i].points
+            self.combined_discardpile += self.discardpiles[i]
 
     def play(self):
         for i in range(self.num):
