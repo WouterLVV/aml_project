@@ -62,7 +62,7 @@ class Round:
     def play(self):
         for i in range(self.num):
             player_id = (i + self.first_player_id) % self.num
-            card = self.players[player_id].make_move(self)
+            card = self.players[player_id].make_move(self, player_id)
             self.cards[player_id] = card
             if self.first_suit is Suit.NONE:
                 self.first_suit = card.suit

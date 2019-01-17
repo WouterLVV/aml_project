@@ -1,8 +1,8 @@
 from logic.cards import Suit, QUEENOFSPADES, TWOOFCLUBS
+import random
 
 
 class Agent:
-
     def __init__(self, deck):
         self.hand = []
         self.cardset = set()
@@ -28,7 +28,7 @@ class Agent:
     def receive_card(self, card):
         self.hand.append(card)
 
-    def win_cards(self,cards):
+    def win_cards(self, cards):
         self.won_cards.extend(cards)
         for card in cards:
             if card.suit == Suit.HEARTS:
@@ -36,9 +36,9 @@ class Agent:
             if card == QUEENOFSPADES:
                 self.points += 13
 
-    def make_move(self, table):
-        card = self.pick_card(table)
-        if not self.check_valid(card,table):
+    def make_move(self, table, player_id):
+        card = self.pick_card(table, player_id)
+        if not self.check_valid(card, table):
             self.points += 1000
         self.hand.remove(card)
         self.suit_counter[card.suit] -= 1
@@ -48,7 +48,7 @@ class Agent:
             self.have_two_of_clubs = False
         return card
 
-    def pick_card(self, table):
+    def pick_card(self, table, player_id):
         print("Method needs to be overridden")
         pass
 
@@ -62,10 +62,10 @@ class Agent:
         valid &= self.have_two_of_clubs == (card == TWOOFCLUBS)
         return valid
 
-    def determine_valid_options(self, hand, table):
-        valid_options=[]
+    def determine_valid_options(self, table):
+        valid_options = []
         for i in self.hand:
-            if self.check_valid(i, table)== True:
+            if self.check_valid(i, table):
                 valid_options.append(i)
         return valid_options
 
@@ -78,10 +78,8 @@ class Agent:
         #         self.points += 13
         return self.points
 
-import random
 
 class HumanPlayer(Agent):
-
     def __init__(self, deck, ask_name=False):
         super(HumanPlayer, self).__init__(deck)
         if ask_name:
@@ -93,7 +91,7 @@ class HumanPlayer(Agent):
         cards.sort()
         super(HumanPlayer, self).receive_hand(cards)
 
-    def pick_card(self, table):
+    def pick_card(self, table, player_id):
         print("\n-------------------------\n")
         print("Current table: ")
         print("\n".join(["{}: {}".format(table.players[i].name, table.cards[i]) for i in range(len(table.players))]))
@@ -117,8 +115,8 @@ class RandomAI(Agent):
         super(RandomAI, self).__init__(deck)
         self.name = "RetardedAI#" + str(random.randrange(0,1000))
 
-    def pick_card(self, table):
-        card = self.hand[random.randrange(0,len(self.hand))]
+    def pick_card(self, table, player_id):
+        card = self.hand[random.randrange(0, len(self.hand))]
         while not self.check_valid(card, table):
             card = self.hand[random.randrange(0, len(self.hand))]
         return card

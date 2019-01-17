@@ -44,7 +44,8 @@ class Simulator:
                 action_vector = [cards_to_vector(card) for card in round_.cards]
 
                 hands_vector = [cards_to_vector(hand) for hand in round_.hands]
-                discard_vector = [cards_to_vector(discard) for discard in round_.discardpiles]
+
+                discard_vector = [cards_to_vector(round_.combined_discardpile) for _ in range(0, 4)]
                 action_vector_based_on_order_of_play = action_vector[round_.first_player_id:]+action_vector[:round_.first_player_id]
                 table_vector = [np.zeros((52,), dtype=np.bool) if k == 0 else np.sum(action_vector_based_on_order_of_play[:k], axis=0) for k in range(0, 4)]
                 first_suit_vector = [suits_to_vector(round_.first_suit) if round_.first_player_id == x else suits_to_vector(Suit(0)) for x in range(0, 4)]
