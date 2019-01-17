@@ -37,7 +37,6 @@ class HeartsSpectator(Frame,Hearts):
             self.options['animate'] = anim_toggle
             viewmenu.add_checkbutton(label="animations", variable=anim_toggle, command=self.changed)
 
-
             cardsize = DoubleVar()
             cardsize.set(.4)
             self.options['cardsize'] = cardsize
@@ -79,13 +78,10 @@ class HeartsSpectator(Frame,Hearts):
                     d[k] = v.get()
                 json.dump(d, conffile)
 
-
-
         def changed(self):
             for k,v in self.options.items():
                 self.parent.__dict__[k] = v.get()
             self.save_config()
-
 
     def __init__(self, players, deck=STANDARDGUIDECK, master=None):
         Frame.__init__(self,master)
@@ -99,19 +95,16 @@ class HeartsSpectator(Frame,Hearts):
         self.animation_duration = 0.5
         self.last_round = None
 
-
         self.init_window()
 
     def play_round(self, verbose=True):
-        round = Hearts.play_round(self,verbose)
-        self.visualize_round(round)
-
+        round_ = Hearts.play_round(self, verbose)
+        self.visualize_round(round_)
 
     def visualize_round(self, round):
         if self.last_round is not None:
             for player in self.last_round.players:
                 player.card_img.destroy()
-
 
         num_players = len(round.players)
         dist = math.tau/num_players
@@ -134,8 +127,6 @@ class HeartsSpectator(Frame,Hearts):
             # ----------------------------
 
             handsize = len(round.hands[i])
-            
-
 
             # ----------------------------
 
@@ -157,7 +148,6 @@ class HeartsSpectator(Frame,Hearts):
 
         self.last_round = round
 
-
     def init_window(self):
         self.master.title("Hearts")
 
@@ -178,5 +168,6 @@ def four_random():
     root.geometry("1920x1080")
     game = HeartsSpectator(players, master=root)
     root.mainloop()
+
 
 four_random()
