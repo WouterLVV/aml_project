@@ -58,7 +58,6 @@ class Simulator:
                 history.append(round_history)
         return history
 
-    @staticmethod
     def separate_history(self, history, player_id=0):
         states = np.array([round_history["state"][player_id] for round_history in history])
         actions = np.array([round_history["action"][player_id] for round_history in history])
