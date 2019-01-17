@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 
 
 class Simulator:
-    def __init__(self, players, number_of_games_per_cycle, number_of_update_cycles, neural_network, update_rate):
+    def __init__(self, players, number_of_games_per_cycle, number_of_update_cycles, neural_network, update_rate, tensorflow_session):
         self.players = players
         self.number_of_update_cycles = number_of_update_cycles
         self.number_of_games = number_of_games_per_cycle
@@ -15,6 +15,7 @@ class Simulator:
         self.update_rate = update_rate
         self.losses = []
         self.game_count = 0
+        self.tensorflow_session = tensorflow_session
 
     def run_games(self):
         for _ in range(self.number_of_games):
@@ -25,23 +26,23 @@ class Simulator:
             self.played_games.append(hearts)
 
     def run_cycles(self):
-        with tf.Session() as sess:
-            variable_initializer = tf.global_variables_initializer()
-            sess.run(variable_initializer)
-            for _ in range(self.number_of_update_cycles):
-                self.run_games()
-                history = self.collect_histories()
-                self.reset_games()
+        variable_initializer = tf.global_variables_initializer()
+        self.tensorflow_session.run(variable_initializer)
+        for _ in range(self.number_of_update_cycles):
+            self.run_games()
+            history = self.collect_histories()
+            self.reset_games()
 
-                states, actions, rewards, next_states, final_states = self.separate_history(history)
+            states, actions, rewards, next_states, final_states = self.separate_history(history)
 
-                targets = [r if f else r+self.update_rate*np.min(sess.run(self.neural_network.output, feed_dict={self.neural_network.inputs_: np.array([ns])})) for (r, f, ns) in zip(rewards, final_states, next_states)]
+            targets = [r if f else r+self.update_rate*np.min(self.tensorflow_session.run(self.neural_network.output, feed_dict={self.neural_network.inputs_: np.array([ns])})) for (r, f, ns) in zip(rewards, final_states, next_states)]
 
-                loss, _ = sess.run([self.neural_network.loss, self.neural_network.optimizer],
-                                   feed_dict={self.neural_network.inputs_: states,
-                                              self.neural_network.target_Q: targets,
-                                              self.neural_network.action_: actions})
-                self.losses.append(loss)
+            loss, _ = self.tensorflow_session.run([self.neural_network.loss, self.neural_network.optimizer],
+                                                  feed_dict={self.neural_network.inputs_: states,
+                                                             self.neural_network.target_Q: targets,
+                                                             self.neural_network.action_: actions})
+            self.losses.append(loss)
+            print("----------------- NEW EPOCH -----------------")
 
     def collect_histories(self):
         history = []

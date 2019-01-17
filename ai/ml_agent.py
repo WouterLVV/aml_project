@@ -6,12 +6,13 @@ import tensorflow as tf
 
 
 class ml_agent(Agent):
-    def __init__(self, neural_network, deck=STANDARDDECK, games_played=0, decay_rate=1):
+    def __init__(self, neural_network, tensorflow_session, deck=STANDARDDECK, games_played=0, decay_rate=1):
         Agent.__init__(self, deck)
         self.neural_network = neural_network
         self.name = "Learned AI"
         self.games_played = games_played
         self.decay_rate = decay_rate
+        self.tensorflow_session = tensorflow_session
 
     def pick_card(self, table, player_id):
         options = self.determine_valid_options(table)
@@ -22,12 +23,8 @@ class ml_agent(Agent):
         if self.get_exploration_rate() > random_checker:
             card = options[random.randrange(0, len(options))]
         else:
-            with tf.Session() as tensorflow_session:
-                # TODO kijk of dit wel strookt met session in Simulator
-                variable_initializer = tf.global_variables_initializer()
-                tensorflow_session.run(variable_initializer)
-                choices = np.array(tensorflow_session.run(self.neural_network.output, feed_dict={self.neural_network.inputs_: [state]}))
-                choice = np.argmin((choices+100)*np.array([np.inf if x == 0 else 1 for x in cards_to_vector(self.hand)]))
+            choices = np.array(self.tensorflow_session.run(self.neural_network.output, feed_dict={self.neural_network.inputs_: [state]}))
+            choice = np.argmin((choices+100)*np.array([np.inf if x == 0 else 1 for x in cards_to_vector(self.hand)]))
             card = NUM2CARD[choice]
         return card
 
@@ -47,4 +44,7 @@ class ml_agent(Agent):
         return score
 
     def reset(self, deck):
-        self.__init__(deck=deck, neural_network=self.neural_network, games_played=self.games_played)
+        self.__init__(deck=deck,
+                      neural_network=self.neural_network,
+                      games_played=self.games_played,
+                      tensorflow_session=self.tensorflow_session)
