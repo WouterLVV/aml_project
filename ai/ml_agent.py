@@ -24,7 +24,7 @@ class ml_agent(Agent):
             card = options[random.randrange(0, len(options))]
         else:
             choices = np.array(self.tensorflow_session.run(self.neural_network.output, feed_dict={self.neural_network.inputs_: [state]}))
-            choice = np.argmin((choices+100)*np.array([np.inf if x == 0 else 1 for x in cards_to_vector(self.hand)]))
+            choice = np.argmin((choices+1000)*np.array([np.inf if x == 0 else 1 for x in cards_to_vector(self.hand)]))
             card = NUM2CARD[choice]
         return card
 
