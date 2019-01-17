@@ -2,6 +2,7 @@ import tensorflow as tf
 from logic.game import Hearts
 import numpy as np
 from logic.cards import cards_to_vector, suits_to_vector, Suit
+import matplotlib.pyplot as plt
 
 
 class Simulator:
@@ -70,3 +71,10 @@ class Simulator:
 
     def reset_games(self):
         self.played_games = []
+
+    def plot_losses(self):
+        plt.plot(range(len(self.losses)), self.losses)
+        plt.title('Value loss function per cycle')
+        plt.xlabel('Number of cycles')
+        plt.ylabel('Value loss function')
+        plt.show()
