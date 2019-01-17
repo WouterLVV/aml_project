@@ -30,6 +30,7 @@ class Hearts:
             score = player.end_game()
             if verbose:
                 print("{} got {} points!".format(player.name, score))
+            player.__init__(deck=self.deck)
 
     def play_game(self):
         num_rounds = len(self.deck) // self.players
@@ -42,16 +43,18 @@ class Round:
     def __init__(self, players, first_player_id, broken):
         self.first_player_id = first_player_id
         self.broken = broken
-        self.players = players # 4 lang
-        self.cards = [None]*len(players) # 4 lang
+        self.players = players
+        self.cards = [None]*len(players)
         self.num = len(players)
         self.first_suit = None
         self.hands = [None]*self.num
         self.discardpiles = [None]*self.num
+        self.scores = [None]*self.num
+        self.rewards = [None]*self.num
         for i in range(self.num):
             self.hands[i] = self.players[i].hand[:]
             self.discardpiles[i] = self.players[i].played[:]
-        # TODO Maak functie die self.rewards uitrekent
+            self.scores[i] = self.players[i].points
 
     def play(self):
         for i in range(self.num):
@@ -63,9 +66,6 @@ class Round:
             self.broken |= self.first_suit != Suit.HEARTS and card.suit == Suit.HEARTS
         assert self.first_suit is not None and not Suit.NONE
 
-
-
-
     def finish(self):
         highestcard = -1
         for i in range(self.num):
@@ -73,7 +73,6 @@ class Round:
                 winner = i
                 highestcard = self.cards[i]
         self.players[winner].win_cards(self.cards[:])
-        self.scores = [None]*self.num
         for i in range(self.num):
-            self.scores[i] = self.players[i].points
+            self.rewards[i] = self.players[i].points-self.scores
         return winner

@@ -19,7 +19,6 @@ class Simulator:
             hearts = Hearts(players=self.players)
             hearts.play_game()
             self.played_games.append(hearts)
-            # TODO player score geval reset functie
 
     def run_cycles(self):
         with tf.Session() as sess:
@@ -30,7 +29,7 @@ class Simulator:
 
                 states, actions, rewards, next_states, final_states = self.separate_history(history)
 
-                targets = [r if f else r+self.update_rate*np.max(sess.run(self.neural_network.output, feed_dict={self.neural_network.inputs_: ns})) for (r, f, ns) in zip(rewards, final_states, next_states)]
+                targets = [r if f else r+self.update_rate*np.min(sess.run(self.neural_network.output, feed_dict={self.neural_network.inputs_: ns})) for (r, f, ns) in zip(rewards, final_states, next_states)]
 
                 loss, _ = sess.run([self.neural_network.loss, self.neural_network.optimizer],
                                    feed_dict={self.neural_network.inputs_: states,
@@ -59,6 +58,7 @@ class Simulator:
                 history.append(round_history)
         return history
 
+    @staticmethod
     def separate_history(self, history, player_id=0):
         states = np.array([round_history["state"][player_id] for round_history in history])
         actions = np.array([round_history["action"][player_id] for round_history in history])
