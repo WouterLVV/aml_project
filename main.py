@@ -7,7 +7,7 @@ import tensorflow as tf
 
 start_time = time.time()
 with tf.Session() as tensorflow_session:
-    neural_network = DQNetwork(161, 52, [200, 100, 100], ['sigmoid', 'elu', 'relu', 'sigmoid'], 0.5)
+    neural_network = DQNetwork(161, 52, [200, 100, 100], ['sigmoid', 'elu', 'relu', 'sigmoid'], 0.3)
     players = [ml_agent(neural_network=neural_network, tensorflow_session=tensorflow_session),
                ml_agent(neural_network=neural_network, tensorflow_session=tensorflow_session),
                ml_agent(neural_network=neural_network, tensorflow_session=tensorflow_session),
@@ -16,7 +16,7 @@ with tf.Session() as tensorflow_session:
                           number_of_games_per_cycle=50,
                           number_of_update_cycles=100,
                           neural_network=neural_network,
-                          update_rate=1,
+                          update_rate=0.4,
                           tensorflow_session=tensorflow_session)
     simulator.run_cycles()
 

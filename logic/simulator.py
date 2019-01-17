@@ -33,14 +33,14 @@ class Simulator:
             history = self.collect_histories()
             self.reset_games()
 
-            states, actions, rewards, next_states, final_states = self.separate_history(history)
+            for i in range(len(self.players)):
+                states, actions, rewards, next_states, final_states = self.separate_history(history, player_id=i)
+                targets = [r if f else r+self.update_rate*np.min(self.tensorflow_session.run(self.neural_network.output, feed_dict={self.neural_network.inputs_: np.array([ns])})) for (r, f, ns) in zip(rewards, final_states, next_states)]
+                loss, _ = self.tensorflow_session.run([self.neural_network.loss, self.neural_network.optimizer],
+                                                      feed_dict={self.neural_network.inputs_: states,
+                                                                 self.neural_network.target_Q: targets,
+                                                                 self.neural_network.action_: actions})
 
-            targets = [r if f else r+self.update_rate*np.min(self.tensorflow_session.run(self.neural_network.output, feed_dict={self.neural_network.inputs_: np.array([ns])})) for (r, f, ns) in zip(rewards, final_states, next_states)]
-
-            loss, _ = self.tensorflow_session.run([self.neural_network.loss, self.neural_network.optimizer],
-                                                  feed_dict={self.neural_network.inputs_: states,
-                                                             self.neural_network.target_Q: targets,
-                                                             self.neural_network.action_: actions})
             self.losses.append(loss)
             print("----------------- NEW EPOCH -----------------")
 
