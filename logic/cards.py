@@ -249,6 +249,8 @@ def suits_to_vector(suits):
 def cards_to_vector(cards):
     vector = np.zeros((52,), dtype=np.bool)
     for i in cards:
+        if i is None:
+            continue
         vector[CARD2NUM[i]] = 1
     return vector
 

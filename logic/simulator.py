@@ -14,15 +14,20 @@ class Simulator:
         self.played_games = []
         self.update_rate = update_rate
         self.losses = []
+        self.game_count = 0
 
     def run_games(self):
         for _ in range(self.number_of_games):
             hearts = Hearts(players=self.players)
             hearts.play_game()
+            self.game_count += 1
+            print("Scores: {}".format(hearts.scores))
             self.played_games.append(hearts)
 
     def run_cycles(self):
         with tf.Session() as sess:
+            variable_initializer = tf.global_variables_initializer()
+            sess.run(variable_initializer)
             for _ in range(self.number_of_update_cycles):
                 self.run_games()
                 history = self.collect_histories()
@@ -30,31 +35,30 @@ class Simulator:
 
                 states, actions, rewards, next_states, final_states = self.separate_history(history)
 
-                targets = [r if f else r+self.update_rate*np.min(sess.run(self.neural_network.output, feed_dict={self.neural_network.inputs_: ns})) for (r, f, ns) in zip(rewards, final_states, next_states)]
+                targets = [r if f else r+self.update_rate*np.min(sess.run(self.neural_network.output, feed_dict={self.neural_network.inputs_: np.array([ns])})) for (r, f, ns) in zip(rewards, final_states, next_states)]
 
                 loss, _ = sess.run([self.neural_network.loss, self.neural_network.optimizer],
                                    feed_dict={self.neural_network.inputs_: states,
                                               self.neural_network.target_Q: targets,
-                                              self.neural_network.actions_: actions})
+                                              self.neural_network.action_: actions})
                 self.losses.append(loss)
 
     def collect_histories(self):
         history = []
         for game in self.played_games:
             for round_ in game.history:
-                action_vector = [cards_to_vector(card) for card in round_.cards]
+                action_vector = [cards_to_vector([card]) for card in round_.cards]
 
                 hands_vector = [cards_to_vector(hand) for hand in round_.hands]
-
-                discard_vector = [cards_to_vector(round_.combined_discardpile) for _ in range(0, 4)]
-                action_vector_based_on_order_of_play = action_vector[round_.first_player_id:]+action_vector[:round_.first_player_id]
-                table_vector = [np.zeros((52,), dtype=np.bool) if k == 0 else np.sum(action_vector_based_on_order_of_play[:k], axis=0) for k in range(0, 4)]
-                first_suit_vector = [suits_to_vector(round_.first_suit) if round_.first_player_id == x else suits_to_vector(Suit(0)) for x in range(0, 4)]
-                state_vector = [hv+dv+tv+fv for (hv, dv, tv, fv) in zip(hands_vector, discard_vector, table_vector, first_suit_vector)]
+                discard_vector = [cards_to_vector(round_.combined_discardpile) for _ in range(4)]
+                action_vector_based_on_order_of_play = np.concatenate((round_.cards[round_.first_player_id:], round_.cards[:round_.first_player_id]))
+                table_vector = [np.zeros((52,), dtype=np.bool) if k == 0 else cards_to_vector(action_vector_based_on_order_of_play[:k]) for k in range(4)]
+                first_suit_vector = [suits_to_vector([round_.first_suit]) if round_.first_player_id == x else suits_to_vector([Suit(0)]) for x in range(4)]
+                state_vector = [np.concatenate(p) for p in zip(hands_vector, discard_vector, table_vector, first_suit_vector)]
 
                 reward_vector = round_.rewards
 
-                final_states_vector = tf.ones(4) if sum(round_.hands[0]) == 1 else tf.zeros(4)
+                final_states_vector = [True]*4 if len(round_.hands[0]) == 1 else [False]*4
 
                 round_history = {"state": state_vector, "action": action_vector, "reward": reward_vector, "final": final_states_vector}
                 history.append(round_history)

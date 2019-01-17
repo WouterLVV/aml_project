@@ -18,6 +18,9 @@ class Agent:
     def __str__(self):
         return self.name
 
+    def reset(self, deck):
+        self.__init__(deck)
+
     def receive_hand(self, cards):
         self.hand = cards
         for card in cards:
@@ -59,7 +62,8 @@ class Agent:
             valid &= (card.suit == table.first_suit if self.suit_counter[table.first_suit] > 0 else True)
         if self.suit_counter[Suit.HEARTS] < len(self.hand) and not table.broken and table.first_suit == Suit.NONE:
             valid &= card.suit != Suit.HEARTS
-        valid &= self.have_two_of_clubs == (card == TWOOFCLUBS)
+        if len(self.hand) == 13:
+            valid &= self.have_two_of_clubs == (card == TWOOFCLUBS)
         return valid
 
     def determine_valid_options(self, table):

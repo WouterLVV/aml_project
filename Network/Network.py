@@ -24,7 +24,7 @@ class DQNetwork:
         self.layer_activation_functions = layer_activation_functions
 
         try:
-            assert len(self.layer_activation_functions) != len(self.hidden_sizes)+1
+            assert len(self.layer_activation_functions) == len(self.hidden_sizes)+1
         except AssertionError:
             if len(self.layer_activation_functions) > len(self.hidden_sizes)+1:
                 print("Too many activation functions, must be length(hidden sizes) +1 ")
@@ -33,8 +33,8 @@ class DQNetwork:
             exit(1)
 
         with tf.variable_scope(name):
-            self.inputs_ = tf.placeholder(tf.float32, [None, self.state_size], name="inputs")
-            self.action_ = tf.placeholder(tf.float32, [None, self.action_size], name="actions_")
+            self.inputs_ = tf.placeholder(tf.float32, shape=[None, self.state_size], name="inputs")
+            self.action_ = tf.placeholder(tf.float32, shape=[None, self.action_size], name="actions_")
             self.target_Q = tf.placeholder(tf.float32, [None], name="target")
 
             input_ = self.inputs_

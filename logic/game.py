@@ -7,6 +7,7 @@ class Hearts:
         self.deck = deck
         self.history = []
         self.broken = False
+        self.scores = [None]*4
         num_players = len(players)
 
         hands = deck.deal(num_players, destructive=False)
@@ -26,14 +27,14 @@ class Hearts:
         return round_
 
     def finish(self, verbose=False):
-        for player in self.players:
-            score = player.end_game()
+        for i, player in enumerate(self.players):
+            self.scores[i] = player.end_game()
             if verbose:
-                print("{} got {} points!".format(player.name, score))
-            player.__init__(deck=self.deck)
+                print("{} got {} points!".format(player.name, self.scores[i]))
+            player.reset(deck=self.deck)
 
     def play_game(self):
-        num_rounds = len(self.deck) // self.players
+        num_rounds = len(self.deck) // len(self.players)
         for i in range(num_rounds):
             self.play_round()
         self.finish()
@@ -46,7 +47,7 @@ class Round:
         self.players = players
         self.cards = [None]*len(players)
         self.num = len(players)
-        self.first_suit = None
+        self.first_suit = Suit.NONE
         self.hands = [None]*self.num
         self.discardpiles = [None]*self.num
         self.scores = [None]*self.num
@@ -66,7 +67,7 @@ class Round:
             self.cards[player_id] = card
             if self.first_suit is Suit.NONE:
                 self.first_suit = card.suit
-            self.broken |= self.first_suit != Suit.HEARTS and card.suit == Suit.HEARTS
+            self.broken |= card.suit == Suit.HEARTS
         assert self.first_suit is not None and not Suit.NONE
 
     def finish(self):
@@ -77,5 +78,5 @@ class Round:
                 highestcard = self.cards[i]
         self.players[winner].win_cards(self.cards[:])
         for i in range(self.num):
-            self.rewards[i] = self.players[i].points-self.scores
+            self.rewards[i] = self.players[i].points-self.scores[i]
         return winner
