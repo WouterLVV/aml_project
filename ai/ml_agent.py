@@ -47,4 +47,5 @@ class ml_agent(Agent):
         self.__init__(deck=deck,
                       neural_network=self.neural_network,
                       games_played=self.games_played,
+                      decay_rate=self.decay_rate,
                       tensorflow_session=self.tensorflow_session)

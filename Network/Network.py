@@ -44,9 +44,19 @@ class DQNetwork:
                 if activation_function == "sigmoid":
                     input_ = tf.nn.sigmoid(tf.matmul(input_, self.init_weights([input_size, output_size])))
                 elif activation_function == "relu":
-                    input_ = tf.nn.relu(tf.matmul(input_, self.init_weights([input_size, output_size])))
+                    input_ = tf.nn.relu(tf.matmul(input_, self.init_weights([input_size, output_size]))+self.init_weights([output_size]))
                 elif activation_function == "elu":
                     input_ = tf.nn.elu(tf.matmul(input_, self.init_weights([input_size, output_size])))
+                elif activation_function == "softplus":
+                    input_ = tf.nn.softplus(tf.matmul(input_, self.init_weights([input_size, output_size])))
+                elif activation_function == "softsign":
+                    input_ = tf.nn.softsign(tf.matmul(input_, self.init_weights([input_size, output_size])))
+                elif activation_function == "softmax":
+                    input_ = tf.nn.softmax(tf.matmul(input_, self.init_weights([input_size, output_size]))+self.init_weights([output_size]))
+                elif activation_function == "tanh":
+                    input_ = tf.nn.tanh(tf.matmul(input_, self.init_weights([input_size, output_size])))
+                elif activation_function == "leaky_relu":
+                    input_ = tf.nn.leaky_relu(tf.matmul(input_, self.init_weights([input_size, output_size])))
                 else:
                     print("please specify proper activation_function.")
                     print("%s is not a valid activation function for this network." % activation_function)
@@ -64,6 +74,5 @@ class DQNetwork:
 
             self.optimizer = tf.train.AdamOptimizer(self.learning_rate).minimize(self.loss)
 
-    @staticmethod
-    def init_weights(shape):
-        return tf.Variable(tf.random_normal(shape, stddev=0.01))
+    def init_weights(self, shape):
+        return tf.Variable(tf.truncated_normal(shape, stddev=0.001))

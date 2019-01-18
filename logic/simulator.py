@@ -28,7 +28,7 @@ class Simulator:
     def run_cycles(self):
         variable_initializer = tf.global_variables_initializer()
         self.tensorflow_session.run(variable_initializer)
-        for _ in range(self.number_of_update_cycles):
+        for m in range(self.number_of_update_cycles):
             self.run_games()
             history = self.collect_histories()
             self.reset_games()
@@ -42,7 +42,7 @@ class Simulator:
                                                                  self.neural_network.action_: actions})
 
             self.losses.append(loss)
-            print("----------------- NEW EPOCH -----------------")
+            print("----------------- EPOCH {} -----------------".format(m))
 
     def collect_histories(self):
         history = []
