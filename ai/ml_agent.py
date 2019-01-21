@@ -19,8 +19,9 @@ class ml_agent(Agent):
 
         state = self.get_state(table, player_id)
 
-        random_checker = np.random.rand()
+        random_checker = np.random.rand()+100
         if self.get_exploration_rate() > random_checker:
+            print("Picking random card")
             card = options[random.randrange(0, len(options))]
         else:
             choices = np.array(self.tensorflow_session.run(self.neural_network.output, feed_dict={self.neural_network.inputs_: [state]}))

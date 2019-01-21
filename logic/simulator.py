@@ -3,7 +3,10 @@ from logic.game import Hearts
 import numpy as np
 from logic.cards import cards_to_vector, suits_to_vector, Suit
 import matplotlib.pyplot as plt
+import time
 
+def run_wrapper(game):
+    return game.play_game()
 
 class Simulator:
     def __init__(self, players, number_of_games_per_cycle, number_of_update_cycles, neural_network, update_rate, tensorflow_session):
@@ -17,21 +20,28 @@ class Simulator:
         self.game_count = 0
         self.tensorflow_session = tensorflow_session
 
+
     def run_games(self):
         for _ in range(self.number_of_games):
             hearts = Hearts(players=self.players)
             hearts.play_game()
             self.game_count += 1
-            print("Scores: {}".format(hearts.scores))
+            print("{:8}\tScores: {}".format(self.game_count, hearts.scores))
             self.played_games.append(hearts)
 
     def run_cycles(self):
         variable_initializer = tf.global_variables_initializer()
         self.tensorflow_session.run(variable_initializer)
         for m in range(self.number_of_update_cycles):
+            start_time = time.time()
             self.run_games()
             history = self.collect_histories()
             self.reset_games()
+
+            print("Games are done")
+            end_time = time.time()
+            t = end_time - start_time
+            print("Time taken to simulate: {}".format(t))
 
             for i in range(len(self.players)):
                 states, actions, rewards, next_states, final_states = self.separate_history(history, player_id=i)
@@ -83,3 +93,25 @@ class Simulator:
         plt.xlabel('Number of cycles')
         plt.ylabel('Value loss function')
         plt.show()
+
+
+from multiprocessing import Pool
+from logic.agent import RandomAI
+
+class RandomGameSimulator(Simulator):
+
+    def __init__(self, number_of_games_per_cycle, number_of_update_cycles, neural_network, update_rate, tensorflow_session, thread_count):
+        Simulator.__init__(self, [RandomAI() for _ in range(4)], number_of_games_per_cycle, number_of_update_cycles, neural_network, update_rate, tensorflow_session)
+        self.thread_count = thread_count
+
+    def run_games(self):
+        if self.thread_count > 1:
+            games = [Hearts(players=[RandomAI() for _ in range(4)]) for _ in range(self.number_of_games)]
+            pool = Pool(processes=self.thread_count)
+            games = pool.map(run_wrapper, games)
+            pool.close()
+            print('\n'.join(["{:8}\tScores: {}".format(i, v.scores) for (i,v) in enumerate(games)]))
+            self.played_games = (games)
+            return None
+        else:
+            Simulator.run_cycles(self)

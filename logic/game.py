@@ -38,6 +38,7 @@ class Hearts:
         for i in range(num_rounds):
             self.play_round()
         self.finish()
+        return self
 
 
 class Round:

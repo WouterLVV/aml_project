@@ -1,9 +1,9 @@
-from logic.cards import Suit, QUEENOFSPADES, TWOOFCLUBS
+from logic.cards import Suit, QUEENOFSPADES, TWOOFCLUBS, STANDARDDECK
 import random
 
 
 class Agent:
-    def __init__(self, deck):
+    def __init__(self, deck=STANDARDDECK):
         self.hand = []
         self.cardset = set()
         self.played = []
@@ -84,7 +84,7 @@ class Agent:
 
 
 class HumanPlayer(Agent):
-    def __init__(self, deck, ask_name=False):
+    def __init__(self, deck=STANDARDDECK, ask_name=False):
         super(HumanPlayer, self).__init__(deck)
         if ask_name:
             self.name = input("Your Name: ")
@@ -115,7 +115,7 @@ class HumanPlayer(Agent):
 
 class RandomAI(Agent):
 
-    def __init__(self, deck):
+    def __init__(self, deck=STANDARDDECK):
         super(RandomAI, self).__init__(deck)
         self.name = "RetardedAI#" + str(random.randrange(0,1000))
 
@@ -124,3 +124,4 @@ class RandomAI(Agent):
         while not self.check_valid(card, table):
             card = self.hand[random.randrange(0, len(self.hand))]
         return card
+
