@@ -5,8 +5,10 @@ from logic.cards import cards_to_vector, suits_to_vector, Suit
 import matplotlib.pyplot as plt
 import time
 
+
 def run_wrapper(game):
     return game.play_game()
+
 
 class Simulator:
     def __init__(self, players, number_of_games_per_cycle, number_of_update_cycles, neural_network, update_rate, tensorflow_session):
@@ -19,7 +21,6 @@ class Simulator:
         self.losses = []
         self.game_count = 0
         self.tensorflow_session = tensorflow_session
-
 
     def run_games(self):
         for _ in range(self.number_of_games):

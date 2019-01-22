@@ -1,5 +1,5 @@
 import tensorflow as tf
-
+import pickle
 
 class DQNetwork:
     """"
@@ -22,6 +22,7 @@ class DQNetwork:
         self.learning_rate = learning_rate
         self.hidden_sizes = hidden_sizes
         self.layer_activation_functions = layer_activation_functions
+        self.name = name
 
         try:
             assert len(self.layer_activation_functions) == len(self.hidden_sizes)+1
@@ -74,5 +75,15 @@ class DQNetwork:
 
             self.optimizer = tf.train.AdamOptimizer(self.learning_rate).minimize(self.loss)
 
-    def init_weights(self, shape):
+    @staticmethod
+    def init_weights(shape):
         return tf.Variable(tf.truncated_normal(shape, stddev=0.001))
+
+    def pickle(self):
+        with open(self.name, 'wb') as f:
+            pickle.dump(self, f, pickle.HIGHEST_PROTOCOL)
+
+    @staticmethod
+    def unpickle(name):
+        with open(name, 'rb') as f:
+            return pickle.load(f)

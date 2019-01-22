@@ -1,7 +1,6 @@
 from Network.Network import DQNetwork
 from logic.simulator import Simulator, RandomGameSimulator
 from ai.ml_agent import ml_agent
-from logic.agent import RandomAI
 import time
 import tensorflow as tf
 
