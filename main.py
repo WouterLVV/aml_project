@@ -8,8 +8,8 @@ start_time = time.time()
 with tf.Session() as tensorflow_session:
     neural_network = DQNetwork(state_size=161,
                                action_size=52,
-                               hidden_sizes=[250, 200, 200, 150, 100],
-                               layer_activation_functions=['relu', 'relu', 'relu', 'relu', 'relu', 'softmax'],
+                               hidden_sizes=[100, 100, 100],
+                               layer_activation_functions=['tanh', 'tanh', 'tanh', 'softmax'],
                                learning_rate=0.3)
     # new_saver = tf.train.import_meta_graph('saved_tensorflow_sessions/tensorflow_session.meta')
     # new_saver.restore(tensorflow_session, tf.train.latest_checkpoint('saved_tensorflow_sessions/'))
@@ -19,12 +19,12 @@ with tf.Session() as tensorflow_session:
                ml_agent(neural_network=neural_network, tensorflow_session=tensorflow_session, decay_rate=0.010),
                ml_agent(neural_network=neural_network, tensorflow_session=tensorflow_session, decay_rate=0.010)]
     simulator = RandomGameSimulator(
-                        number_of_games_per_cycle=2000,
-                        number_of_update_cycles=200,
+                        number_of_games_per_cycle=200,
+                        number_of_update_cycles=20,
                         neural_network=neural_network,
                         update_rate=0.9,
                         tensorflow_session=tensorflow_session,
-                        thread_count=10)
+                        thread_count=6)
     simulator.run_cycles()
     playsim = Simulator(players=players,
                         number_of_games_per_cycle=20,

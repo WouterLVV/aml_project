@@ -1,5 +1,5 @@
 from logic.game import Hearts
-from logic.agent import HumanPlayer,RandomAI
+from logic.agent import HumanPlayer,RandomAI,AnythingGoesAgent
 from logic.cards import STANDARDDECK, Deck
 import random
 import time
@@ -29,8 +29,18 @@ def many_games():
             game.play_round(verbose=False)
         game.finish(verbose=False)
 
+
+def many_games_2():
+    for i in range(100):
+        deck = Deck.gen_default()
+        players = [AnythingGoesAgent(deck) for i in range(4)]
+        game = Hearts(players, deck=deck)
+        for i in range(13):
+            game.play_round(verbose=False)
+        game.finish(verbose=False)
+
 starttime = time.perf_counter_ns()
-many_games()
+many_games_2()
 endtime = time.perf_counter_ns()
 print((endtime-starttime)/1000000000)
 

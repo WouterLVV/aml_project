@@ -97,17 +97,17 @@ class Simulator:
 
 
 from multiprocessing import Pool
-from logic.agent import RandomAI
+from logic.agent import RandomAI,AnythingGoesAgent
 
 class RandomGameSimulator(Simulator):
 
     def __init__(self, number_of_games_per_cycle, number_of_update_cycles, neural_network, update_rate, tensorflow_session, thread_count):
-        Simulator.__init__(self, [RandomAI() for _ in range(4)], number_of_games_per_cycle, number_of_update_cycles, neural_network, update_rate, tensorflow_session)
+        Simulator.__init__(self, [AnythingGoesAgent() for _ in range(4)], number_of_games_per_cycle, number_of_update_cycles, neural_network, update_rate, tensorflow_session)
         self.thread_count = thread_count
 
     def run_games(self):
         if self.thread_count > 1:
-            games = [Hearts(players=[RandomAI() for _ in range(4)]) for _ in range(self.number_of_games)]
+            games = [Hearts(players=[AnythingGoesAgent() for _ in range(4)]) for _ in range(self.number_of_games)]
             pool = Pool(processes=self.thread_count)
             games = pool.map(run_wrapper, games)
             pool.close()

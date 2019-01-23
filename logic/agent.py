@@ -5,6 +5,7 @@ import random
 class Agent:
     def __init__(self, deck=STANDARDDECK):
         self.hand = []
+        self.deck = deck
         self.cardset = set()
         self.played = []
         self.points = 0
@@ -41,13 +42,17 @@ class Agent:
 
     def make_move(self, table, player_id):
         card = self.pick_card(table, player_id)
+        toremove = card
         if not self.check_valid(card, table):
-            self.points += 1000
-        self.hand.remove(card)
-        self.suit_counter[card.suit] -= 1
-        self.cardset.remove(card)
+            self.points += 50
+        if toremove not in self.cardset:
+            self.points += 50
+            toremove = self.hand[random.randrange(0,len(self.hand))]
+        self.hand.remove(toremove)
+        self.suit_counter[toremove.suit] -= 1
+        self.cardset.remove(toremove)
         self.played.append(card)
-        if card == TWOOFCLUBS:
+        if toremove == TWOOFCLUBS:
             self.have_two_of_clubs = False
         return card
 
@@ -60,8 +65,8 @@ class Agent:
         valid &= card in self.cardset
         if table.first_suit is not Suit.NONE:
             valid &= (card.suit == table.first_suit if self.suit_counter[table.first_suit] > 0 else True)
-        if self.suit_counter[Suit.HEARTS] < len(self.hand) and not table.broken and table.first_suit == Suit.NONE:
-            valid &= card.suit != Suit.HEARTS
+        # if self.suit_counter[Suit.HEARTS] < len(self.hand) and not table.broken and table.first_suit == Suit.NONE:
+        #     valid &= card.suit != Suit.HEARTS
         if len(self.hand) == 13:
             valid &= self.have_two_of_clubs == (card == TWOOFCLUBS)
         return valid
@@ -125,3 +130,18 @@ class RandomAI(Agent):
             card = self.hand[random.randrange(0, len(self.hand))]
         return card
 
+
+class AnythingGoesAgent(Agent):
+    def __init__(self, deck=STANDARDDECK):
+        Agent.__init__(self, deck)
+        self.name = "RickAstley"
+
+    def pick_card(self, table, player_id):
+        pick_valid = random.random() > 0.5
+        if pick_valid:
+            card = self.hand[random.randrange(0, len(self.hand))]
+            while not self.check_valid(card, table):
+                card = self.hand[random.randrange(0, len(self.hand))]
+            return card
+        else:
+            return self.deck.cardlist[random.randrange(0,len(self.deck.cardlist))]
