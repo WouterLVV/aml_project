@@ -13,13 +13,13 @@ def run_wrapper(game):
 
 
 class Simulator:
-    def __init__(self, players, number_of_games_per_cycle, number_of_update_cycles, neural_network, future_relevance_factor, tensorflow_session):
+    def __init__(self, players, number_of_games_per_cycle, number_of_update_cycles, neural_network, future_reward_factor, tensorflow_session):
         self.players = players
         self.number_of_update_cycles = number_of_update_cycles
         self.number_of_games = number_of_games_per_cycle
         self.neural_network = neural_network
         self.played_games = []
-        self.future_relevance_factor = future_relevance_factor
+        self.future_reward_factor = future_reward_factor
         self.losses = []
         self.game_count = 0
         self.tensorflow_session = tensorflow_session
@@ -47,7 +47,7 @@ class Simulator:
 
             for i in range(len(self.players)):
                 states, actions, rewards, next_states, final_states = self.separate_history(history, player_id=i)
-                targets = [r if f else r+self.future_relevance_factor*np.min(self.tensorflow_session.run(self.neural_network.output, feed_dict={self.neural_network.inputs_: np.array([ns])})) for (r, f, ns) in zip(rewards, final_states, next_states)]
+                targets = [r if f else r+self.future_reward_factor*np.min(self.tensorflow_session.run(self.neural_network.output, feed_dict={self.neural_network.inputs_: np.array([ns])})) for (r, f, ns) in zip(rewards, final_states, next_states)]
                 loss, _ = self.tensorflow_session.run([self.neural_network.loss, self.neural_network.optimizer],
                                                       feed_dict={self.neural_network.inputs_: states,
                                                                  self.neural_network.target_Q: targets,
@@ -97,13 +97,14 @@ class Simulator:
 
 
 class RandomGameSimulator(Simulator):
-    def __init__(self, number_of_games_per_cycle, number_of_update_cycles, neural_network, future_relevance_factor, tensorflow_session, thread_count):
-        Simulator.__init__(self, [RandomAI() for _ in range(4)], number_of_games_per_cycle, number_of_update_cycles, neural_network, future_relevance_factor, tensorflow_session)
+    def __init__(self, number_of_games_per_cycle, number_of_update_cycles, neural_network, future_reward_factor, tensorflow_session, thread_count, random_from_deck_instead_of_hand=True):
+        Simulator.__init__(self, [RandomAI(random_from_deck_instead_of_hand=random_from_deck_instead_of_hand) for _ in range(4)], number_of_games_per_cycle, number_of_update_cycles, neural_network, future_reward_factor, tensorflow_session)
         self.thread_count = thread_count
+        self.random_from_deck_instead_of_hand = random_from_deck_instead_of_hand
 
     def run_games(self):
         if self.thread_count > 1:
-            games = [Hearts(players=[RandomAI() for _ in range(4)]) for _ in range(self.number_of_games)]
+            games = [Hearts(players=[RandomAI(random_from_deck_instead_of_hand=self.random_from_deck_instead_of_hand) for _ in range(4)]) for _ in range(self.number_of_games)]
             pool = Pool(processes=self.thread_count)
             games = pool.map(run_wrapper, games)
             pool.close()

@@ -126,13 +126,18 @@ class HumanPlayer(Agent):
 
 class RandomAI(Agent):
 
-    def __init__(self, deck=STANDARDDECK):
+    def __init__(self, deck=STANDARDDECK, random_from_deck_instead_of_hand=True):
         super(RandomAI, self).__init__(deck)
         self.name = "RetardedAI#" + str(random.randrange(0,1000))
+        self.random_from_deck_instead_of_hand = random_from_deck_instead_of_hand
 
     def pick_card(self, table, player_id):
-        card = self.deck.cardlist[random.randrange(0, self.deck.__len__())]
-        # while not self.check_valid(card, table):
-        #     card = self.hand[random.randrange(0, len(self.hand))]
+        if self.random_from_deck_instead_of_hand:
+            card = self.deck.cardlist[random.randrange(0, self.deck.__len__())]
+        else:
+            card = self.hand[random.randrange(0, len(self.hand))]
         return card
 
+    def reset(self, deck):
+        self.__init__(deck=deck,
+                      random_from_deck_instead_of_hand=self.random_from_deck_instead_of_hand)

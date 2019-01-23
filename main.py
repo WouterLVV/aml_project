@@ -27,18 +27,19 @@ if __name__ == '__main__':
                    ml_agent(neural_network=neural_network, tensorflow_session=tensorflow_session, decay_rate=100.010),
                    ml_agent(neural_network=neural_network, tensorflow_session=tensorflow_session, decay_rate=100.010)]
         simulator = RandomGameSimulator(
-                            number_of_games_per_cycle=1000,
-                            number_of_update_cycles=10,
+                            number_of_games_per_cycle=2000,
+                            number_of_update_cycles=20,
                             neural_network=neural_network,
-                            future_relevance_factor=0.9,
+                            future_reward_factor=0.9,
                             tensorflow_session=tensorflow_session,
-                            thread_count=1)
+                            thread_count=1,
+                            random_from_deck_instead_of_hand=False)
         simulator.run_cycles()
         playsim = Simulator(players=players,
                             number_of_games_per_cycle=20,
                             number_of_update_cycles=1,
                             neural_network=neural_network,
-                            future_relevance_factor=0.9,
+                            future_reward_factor=0.9,
                             tensorflow_session=tensorflow_session)
         playsim.run_cycles()
 
