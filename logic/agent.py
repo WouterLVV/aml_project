@@ -6,6 +6,7 @@ class Agent:
     def __init__(self, deck=STANDARDDECK):
         self.hand = []
         self.cardset = set()
+        self.deck = deck
         self.played = []
         self.points = 0
         self.won_cards = []
@@ -40,16 +41,26 @@ class Agent:
                 self.points += 13
 
     def make_move(self, table, player_id):
+        attempted_card = None
         card = self.pick_card(table, player_id)
         if not self.check_valid(card, table):
-            self.points += 1000
+            if card in self.hand:
+                self.points += 1000
+            else:
+                self.points += 10000
+            options = self.determine_valid_options(table)
+            attempted_card = card
+            card = options[random.randrange(0, len(options))]
         self.hand.remove(card)
         self.suit_counter[card.suit] -= 1
         self.cardset.remove(card)
         self.played.append(card)
         if card == TWOOFCLUBS:
             self.have_two_of_clubs = False
-        return card
+        if attempted_card is None:
+            return card, card
+        else:
+            return card, attempted_card
 
     def pick_card(self, table, player_id):
         print("Method needs to be overridden")
@@ -120,8 +131,8 @@ class RandomAI(Agent):
         self.name = "RetardedAI#" + str(random.randrange(0,1000))
 
     def pick_card(self, table, player_id):
-        card = self.hand[random.randrange(0, len(self.hand))]
-        while not self.check_valid(card, table):
-            card = self.hand[random.randrange(0, len(self.hand))]
+        card = self.deck.cardlist[random.randrange(0, self.deck.__len__())]
+        # while not self.check_valid(card, table):
+        #     card = self.hand[random.randrange(0, len(self.hand))]
         return card
 

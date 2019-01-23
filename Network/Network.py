@@ -1,5 +1,7 @@
 import tensorflow as tf
 import pickle
+import os
+
 
 class DQNetwork:
     """"
@@ -33,7 +35,7 @@ class DQNetwork:
                 print("Too few activation functions, must be length(hidden sizes) +1 ")
             exit(1)
 
-        with tf.variable_scope(name):
+        with tf.variable_scope(name, reuse=tf.AUTO_REUSE):
             self.inputs_ = tf.placeholder(tf.float32, shape=[None, self.state_size], name="inputs")
             self.action_ = tf.placeholder(tf.float32, shape=[None, self.action_size], name="actions_")
             self.target_Q = tf.placeholder(tf.float32, [None], name="target")
@@ -41,23 +43,25 @@ class DQNetwork:
             input_ = self.inputs_
             input_size = self.state_size
             self.hidden_sizes.append(self.action_size)
-            for (output_size, activation_function) in zip(self.hidden_sizes, self.layer_activation_functions):
+            for i, (output_size, activation_function) in enumerate(zip(self.hidden_sizes, self.layer_activation_functions)):
                 if activation_function == "sigmoid":
-                    input_ = tf.nn.sigmoid(tf.matmul(input_, self.init_weights([input_size, output_size])))
+                    input_ = tf.nn.sigmoid(tf.matmul(input_, self.init_weights("w{}".format(i), [input_size, output_size])))
                 elif activation_function == "relu":
-                    input_ = tf.nn.relu(tf.matmul(input_, self.init_weights([input_size, output_size]))+self.init_weights([output_size]))
+                    input_ = tf.nn.relu(tf.matmul(input_, self.init_weights("w{}".format(i), [input_size, output_size])))
                 elif activation_function == "elu":
-                    input_ = tf.nn.elu(tf.matmul(input_, self.init_weights([input_size, output_size])))
+                    input_ = tf.nn.elu(tf.matmul(input_, self.init_weights(str(i), [input_size, output_size])))
                 elif activation_function == "softplus":
-                    input_ = tf.nn.softplus(tf.matmul(input_, self.init_weights([input_size, output_size])))
+                    input_ = tf.nn.softplus(tf.matmul(input_, self.init_weights(str(i), [input_size, output_size])))
                 elif activation_function == "softsign":
-                    input_ = tf.nn.softsign(tf.matmul(input_, self.init_weights([input_size, output_size])))
+                    input_ = tf.nn.softsign(tf.matmul(input_, self.init_weights(str(i), [input_size, output_size])))
                 elif activation_function == "softmax":
-                    input_ = tf.nn.softmax(tf.matmul(input_, self.init_weights([input_size, output_size]))+self.init_weights([output_size]))
+                    input_ = tf.nn.softmax(tf.matmul(input_, self.init_weights(str(i), [input_size, output_size])))
                 elif activation_function == "tanh":
-                    input_ = tf.nn.tanh(tf.matmul(input_, self.init_weights([input_size, output_size])))
+                    input_ = tf.nn.tanh(tf.matmul(input_, self.init_weights("w{}".format(i), [input_size, output_size])))
+                elif activation_function == "lin":
+                    input_ = tf.matmul(input_, self.init_weights("w{}".format(i), [input_size, output_size]))
                 elif activation_function == "leaky_relu":
-                    input_ = tf.nn.leaky_relu(tf.matmul(input_, self.init_weights([input_size, output_size])))
+                    input_ = tf.nn.leaky_relu(tf.matmul(input_, self.init_weights(str(i), [input_size, output_size])))
                 else:
                     print("please specify proper activation_function.")
                     print("%s is not a valid activation function for this network." % activation_function)
@@ -76,14 +80,17 @@ class DQNetwork:
             self.optimizer = tf.train.AdamOptimizer(self.learning_rate).minimize(self.loss)
 
     @staticmethod
-    def init_weights(shape):
-        return tf.Variable(tf.truncated_normal(shape, stddev=0.001))
+    def init_weights(name, shape):
+        return tf.get_variable(name=name,
+                               shape=shape,
+                               initializer=tf.random_normal_initializer(stddev=0.001))
 
-    def pickle(self):
-        with open(self.name, 'wb') as f:
-            pickle.dump(self, f, pickle.HIGHEST_PROTOCOL)
-
-    @staticmethod
-    def unpickle(name):
-        with open(name, 'rb') as f:
-            return pickle.load(f)
+    # def pickle(self):
+    #     with open(self.name, 'wb') as f:
+    #         pickle.dump(self, f, pickle.HIGHEST_PROTOCOL)
+    #
+    # @staticmethod
+    # def unpickle(name='DQNetwork'):
+    #     with open(name, 'rb') as f:
+    #         # print(os.path.abspath(name))
+    #         return pickle.load(f)
