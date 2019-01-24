@@ -38,6 +38,7 @@ class DQNetwork:
             self.action_ = tf.placeholder(tf.float32, shape=[None, self.action_size], name="actions_")
             self.target_Q = tf.placeholder(tf.float32, [None], name="target")
 
+            self.output = []
             input_ = self.inputs_
             input_size = self.state_size
             self.hidden_sizes.append(self.action_size)
@@ -58,11 +59,14 @@ class DQNetwork:
                     input_ = tf.nn.tanh(tf.matmul(input_, self.init_weights([input_size, output_size])))
                 elif activation_function == "leaky_relu":
                     input_ = tf.nn.leaky_relu(tf.matmul(input_, self.init_weights([input_size, output_size])))
+                elif activation_function == "linear":
+                    input_ = tf.matmul(input_, self.init_weights([input_size, output_size]))
                 else:
                     print("please specify proper activation_function.")
                     print("%s is not a valid activation function for this network." % activation_function)
                     exit(2)
                 input_size = output_size
+                self.output.append(input_)
             del self.hidden_sizes[-1]
             self.output = input_
 

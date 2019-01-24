@@ -27,7 +27,7 @@ class Simulator:
             hearts = Hearts(players=self.players)
             hearts.play_game()
             self.game_count += 1
-            print("{:8}\tScores: {}".format(self.game_count, hearts.scores))
+            #print("{:8}\tScores: {}".format(self.game_count, hearts.scores))
             self.played_games.append(hearts)
 
     def run_cycles(self):
@@ -36,13 +36,14 @@ class Simulator:
         for m in range(self.number_of_update_cycles):
             start_time = time.time()
             self.run_games()
-            history = self.collect_histories()
+            history, totalscore = self.collect_histories()
             self.reset_games()
 
-            print("Games are done")
+            #print("Games are done")
             end_time = time.time()
             t = end_time - start_time
-            print("Time taken to simulate: {}".format(t))
+            #print("Time taken to simulate: {}".format(t))
+            print("Combined scores: {}".format(totalscore))
 
             for i in range(len(self.players)):
                 states, actions, rewards, next_states, final_states = self.separate_history(history, player_id=i)
@@ -57,6 +58,7 @@ class Simulator:
 
     def collect_histories(self):
         history = []
+        totalscore = 0
         for game in self.played_games:
             for round_ in game.history:
                 action_vector = [cards_to_vector([card]) for card in round_.cards]
@@ -74,7 +76,8 @@ class Simulator:
 
                 round_history = {"state": state_vector, "action": action_vector, "reward": reward_vector, "final": final_states_vector}
                 history.append(round_history)
-        return history
+            totalscore += sum(game.scores)
+        return history, totalscore
 
     def separate_history(self, history, player_id=0):
         states = np.array([round_history["state"][player_id] for round_history in history])
