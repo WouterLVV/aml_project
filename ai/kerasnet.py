@@ -24,7 +24,7 @@ class KerasNetwork:
             exit(1)
 
         self.model = Sequential()
-        self.model.add(InputLayer(batch_input_shape=(1,self.state_size), batch_size=1))
+        self.model.add(InputLayer(input_shape=(self.state_size,), batch_size=1))
         self.model.add(Dense(100, activation='tanh'))
         self.model.add(Dense(100, activation='tanh'))
         self.model.add(Dense(self.action_size, activation='linear'))

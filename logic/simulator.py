@@ -27,7 +27,7 @@ class Simulator:
             hearts = Hearts(players=self.players)
             hearts.play_game()
             self.game_count += 1
-            #print("{:8}\tScores: {}".format(self.game_count, hearts.scores))
+            print("{:8}\tScores: {}".format(self.game_count, hearts.scores))
             self.played_games.append(hearts)
 
     def run_cycles(self):

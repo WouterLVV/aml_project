@@ -46,7 +46,7 @@ class KerasAgent(Agent):
             #print("Picking random card")
             card = options[random.randrange(0, len(options))]
         else:
-            choices = self.neural_network.model.predict(state.reshape((1,161)))
+            choices = self.neural_network.model.predict(state.reshape((1,161)), batch_size=1)
             choice = np.argmin((choices+1000))
             card = NUM2CARD[choice]
         return card

@@ -34,20 +34,20 @@ class KerasSimulator(Simulator):
                 #                                 feed_dict={self.neural_network.inputs_: np.array([ns])}))
                 #            for (r, f, ns) in zip(rewards, final_states, next_states)]
                 targets = [r if f else r + self.update_rate * np.min(
-                           self.neural_network.model.predict([ns]))
+                           self.neural_network.model.predict(np.array(ns).reshape((1,161))))
                            for (r, f, ns) in zip(rewards, final_states, next_states)]
 
-                target_vecs = [self.neural_network.model.predict(state)[0] for state in states ]
+                target_vecs = [self.neural_network.model.predict(state.reshape((1,161)))[0] for state in states ]
                 for vec, action, target in zip(target_vecs, actions, targets):
                     vec[action] = target
 
-                loss, _ = self.tensorflow_session.run([self.neural_network.loss, self.neural_network.optimizer],
-                                                      feed_dict={self.neural_network.inputs_: states,
-                                                                 self.neural_network.target_Q: targets,
-                                                                 self.neural_network.action_: actions})
+                # loss, _ = self.tensorflow_session.run([self.neural_network.loss, self.neural_network.optimizer],
+                #                                       feed_dict={self.neural_network.inputs_: states,
+                #                                                  self.neural_network.target_Q: targets,
+                #                                                  self.neural_network.action_: actions})
 
                 for s,a,r,ns,fs,t,tv in zip(states, actions, rewards, next_states, final_states, targets, target_vecs):
-                    self.neural_network.model.fit(s, tv, epochs=1, verbose=True)
+                    self.neural_network.model.fit(np.array(s).reshape((1,161)), np.array(tv).reshape((1,52)), epochs=1, verbose=False)
 
-            self.losses.append(loss)
+            self.losses.append(-1)
             print("----------------- EPOCH {} -----------------".format(m))
