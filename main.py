@@ -16,7 +16,7 @@ if __name__ == '__main__':
                                    action_size=52,
                                    hidden_sizes=[],
                                    layer_activation_functions=['lin'],
-                                   learning_rate=0.00005)
+                                   learning_rate=0.000005)
         saver = tf.train.Saver()
         if load_previously_trained_network:
             saver.restore(tensorflow_session, tf.train.latest_checkpoint('saved_tensorflow_sessions/'))
@@ -34,37 +34,37 @@ if __name__ == '__main__':
                          YoloAI()]
         yolo_players = [YoloAI(), YoloAI(), YoloAI(), YoloAI()]
         simulator_random_deck = RandomGameSimulator(
+                            number_of_games_per_cycle=500,
+                            number_of_update_cycles=2000,
+                            neural_network=neural_network,
+                            future_reward_factor=0.9,
+                            tensorflow_session=tensorflow_session,
+                            thread_count=1,
+                            random_from_deck_instead_of_hand=True)
+        simulator_random = RandomGameSimulator(
                             number_of_games_per_cycle=200,
                             number_of_update_cycles=1000,
                             neural_network=neural_network,
                             future_reward_factor=0.9,
                             tensorflow_session=tensorflow_session,
                             thread_count=1,
-                            random_from_deck_instead_of_hand=True)
-        simulator_random_deck.run_cycles()
-        simulator_random = RandomGameSimulator(
-                            number_of_games_per_cycle=200,
-                            number_of_update_cycles=500,
-                            neural_network=neural_network,
-                            future_reward_factor=0.9,
-                            tensorflow_session=tensorflow_session,
-                            thread_count=1,
                             random_from_deck_instead_of_hand=False)
-        simulator_random.run_cycles()
         simulator_yolo = Simulator(players=yolo_players,
                                    number_of_games_per_cycle=200,
-                                   number_of_update_cycles=150,
+                                   number_of_update_cycles=250,
                                    neural_network=neural_network,
                                    future_reward_factor=0.001,
                                    tensorflow_session=tensorflow_session)
-        simulator_yolo.run_cycles()
         simulator_player = Simulator(players=ml_players,
-                                     number_of_games_per_cycle=2,
+                                     number_of_games_per_cycle=20,
                                      number_of_update_cycles=1,
                                      neural_network=neural_network,
                                      future_reward_factor=0.1,
                                      tensorflow_session=tensorflow_session)
-        simulator_player.run_cycles()
+        # simulator_random_deck.run_cycles()
+        # simulator_random.run_cycles()
+        # simulator_yolo.run_cycles()
+        # simulator_player.run_cycles()
         # vars_ = tf.trainable_variables()
         # vars_vals = tensorflow_session.run(vars_)
         # for var, val in zip(vars_, vars_vals):
@@ -85,8 +85,8 @@ if __name__ == '__main__':
         saver.save(tensorflow_session, './saved_tensorflow_sessions/tensorflow_session2')
         print("Only clubs")
         print(np.array(tensorflow_session.run(neural_network.output, feed_dict={neural_network.inputs_: [[1]*13+[0]*39]})))
-        print("Only last suit")
-        print(np.array(tensorflow_session.run(neural_network.output, feed_dict={neural_network.inputs_: [[0]*39+[1]*13]})))
+        # print("Only last suit")
+        # print(np.array(tensorflow_session.run(neural_network.output, feed_dict={neural_network.inputs_: [[0]*39+[1]*13]})))
 
     end_time = time.time()
     t = end_time-start_time
