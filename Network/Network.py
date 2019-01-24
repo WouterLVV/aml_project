@@ -16,7 +16,7 @@ class DQNetwork:
         name, string; represents the name associated with the neural network
     outputs:
         self.output; Calculate [Q(s'_1,a_1),...Q(s'_n,a_n)] with s'_i is the state after applying a_i on given input state s
-        self.loss; norm 2 error function on Qhat-hat with Qhat = r + gamma*max_{a\inA} Q(s',a) where A is the set of possible action and s' the state after a round.
+        self.loss; norm 2 error function on Qhat-hat with Qhat = r + gamma*min_{a\inA} Q(s',a) where A is the set of possible action and s' the state after a round.
     """
     def __init__(self, state_size, action_size, hidden_sizes, layer_activation_functions, learning_rate, name='DQNetwork'):
         self.state_size = state_size

@@ -1,4 +1,5 @@
 from logic.cards import STANDARDDECK, Suit, Rank, Card, Deck, TWOOFCLUBS
+import numpy as np
 
 
 class Hearts:
@@ -25,6 +26,12 @@ class Hearts:
         if verbose:
             print("Starting player: " + str(round_.players[round_.first_player_id]) + ". -- Cards played: " + ", ".join(["{}: {}".format(round_.players[i].name, round_.cards[i]) for i in range(len(round_.players))]))
         return round_
+
+    def winning_player(self):
+        return np.argmin(self.scores)
+
+    def losing_player(self):
+        return np.argmax(self.scores)
 
     def finish(self, verbose=False):
         for i, player in enumerate(self.players):
@@ -66,7 +73,6 @@ class Round:
         for i in range(self.num):
             player_id = (i + self.first_player_id) % self.num
             card, attempted_card = self.players[player_id].make_move(self, player_id)
-            # card = self.players[player_id].make_move(self, player_id)
             self.attempted_cards[player_id] = attempted_card
             self.cards[player_id] = card
             if self.first_suit is Suit.NONE:

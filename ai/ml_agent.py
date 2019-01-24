@@ -21,11 +21,12 @@ class ml_agent(Agent):
 
         random_checker = np.random.rand()+100
         if self.get_exploration_rate() > random_checker:
-            print("Picking random card")
             card = options[random.randrange(0, len(options))]
+            print("Picking random card {}".format(card.ascii_str()))
         else:
             choices = np.array(self.tensorflow_session.run(self.neural_network.output, feed_dict={self.neural_network.inputs_: [state]}))
-            # choice = np.argmin((choices+1000)*np.array([np.inf if x == 0 else 1 for x in cards_to_vector(self.hand)]))
+            # choice = np.argmin(np.array(self.tensorflow_session.run(self.neural_network.output, feed_dict={self.neural_network.inputs_: [state]})))
+            # choice = np.argmin(choices+np.array([np.inf if x == 0 else 0 for x in cards_to_vector(options)]))
             choice = np.argmin(choices)
             card = NUM2CARD[choice]
         return card
@@ -35,6 +36,7 @@ class ml_agent(Agent):
         table_vector = cards_to_vector(table.cards)
         discard_vector = cards_to_vector(table.combined_discardpile)
         first_suit_vector = suits_to_vector([table.first_suit])
+        return hands_vector
         return np.concatenate((hands_vector, table_vector, discard_vector, first_suit_vector))
 
     def get_exploration_rate(self):

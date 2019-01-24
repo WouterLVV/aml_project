@@ -19,6 +19,8 @@ class Simulator:
         self.number_of_games = number_of_games_per_cycle
         self.neural_network = neural_network
         self.played_games = []
+        self.player_losses = [0]*len(players)
+        self.player_wins = [0]*len(players)
         self.future_reward_factor = future_reward_factor
         self.losses = []
         self.game_count = 0
@@ -29,6 +31,8 @@ class Simulator:
             hearts = Hearts(players=self.players)
             hearts.play_game()
             self.game_count += 1
+            self.player_wins[hearts.winning_player()] += 1
+            self.player_losses[hearts.losing_player()] += 1
             print("{:8}\tScores: {}".format(self.game_count, hearts.scores))
             self.played_games.append(hearts)
 
@@ -47,7 +51,9 @@ class Simulator:
 
             for i in range(len(self.players)):
                 states, actions, rewards, next_states, final_states = self.separate_history(history, player_id=i)
-                targets = [r if f else r+self.future_reward_factor*np.min(self.tensorflow_session.run(self.neural_network.output, feed_dict={self.neural_network.inputs_: np.array([ns])})) for (r, f, ns) in zip(rewards, final_states, next_states)]
+                targets = rewards
+                # targets = [r if f else r+self.future_reward_factor*np.min(self.tensorflow_session.run(self.neural_network.output, feed_dict={self.neural_network.inputs_: np.array([ns])})) for (r, f, ns) in zip(rewards, final_states, next_states)]
+                # targets = [r if f else r+self.future_reward_factor*np.min(self.tensorflow_session.run(self.neural_network.output, feed_dict={self.neural_network.inputs_: np.array([ns])})+np.array([np.inf if x == 0 else 0 for x in ns[0:52]])) for (r, f, ns) in zip(rewards, final_states, next_states)]
                 loss, _ = self.tensorflow_session.run([self.neural_network.loss, self.neural_network.optimizer],
                                                       feed_dict={self.neural_network.inputs_: states,
                                                                  self.neural_network.target_Q: targets,
@@ -72,7 +78,7 @@ class Simulator:
 
                 final_states_vector = [True]*4 if len(round_.hands[0]) == 1 else [False]*4
 
-                round_history = {"state": state_vector, "action": action_vector, "reward": reward_vector, "final": final_states_vector}
+                round_history = {"state": hands_vector, "action": action_vector, "reward": reward_vector, "final": final_states_vector}
                 history.append(round_history)
         return history
 
@@ -87,6 +93,10 @@ class Simulator:
 
     def reset_games(self):
         self.played_games = []
+
+    def reset_win_and_losees(self):
+        self.player_wins = [0]*len(self.players)
+        self.player_losses = [0]*len(self.players)
 
     def plot_losses(self):
         plt.plot(range(len(self.losses)), self.losses)

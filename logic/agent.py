@@ -45,9 +45,9 @@ class Agent:
         card = self.pick_card(table, player_id)
         if not self.check_valid(card, table):
             if card in self.hand:
-                self.points += 1000
+                self.points += 150
             else:
-                self.points += 10000
+                self.points += 500
             options = self.determine_valid_options(table)
             attempted_card = card
             card = options[random.randrange(0, len(options))]
@@ -71,8 +71,8 @@ class Agent:
         valid &= card in self.cardset
         if table.first_suit is not Suit.NONE:
             valid &= (card.suit == table.first_suit if self.suit_counter[table.first_suit] > 0 else True)
-        if self.suit_counter[Suit.HEARTS] < len(self.hand) and not table.broken and table.first_suit == Suit.NONE:
-            valid &= card.suit != Suit.HEARTS
+        # if self.suit_counter[Suit.HEARTS] < len(self.hand) and not table.broken and table.first_suit == Suit.NONE:
+        #     valid &= card.suit != Suit.HEARTS
         if len(self.hand) == 13:
             valid &= self.have_two_of_clubs == (card == TWOOFCLUBS)
         return valid
@@ -141,3 +141,15 @@ class RandomAI(Agent):
     def reset(self, deck):
         self.__init__(deck=deck,
                       random_from_deck_instead_of_hand=self.random_from_deck_instead_of_hand)
+
+
+class YoloAI(Agent):
+
+    def __init__(self, deck=STANDARDDECK):
+        super(YoloAI, self).__init__(deck)
+        self.name = "RetardedAI#" + str(random.randrange(0,1000))
+
+    def pick_card(self, table, player_id):
+        options = self.determine_valid_options(table)
+        card = options[random.randrange(0, len(options))]
+        return card
