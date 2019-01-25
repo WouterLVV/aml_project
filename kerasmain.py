@@ -17,10 +17,10 @@ with tf.Session() as tensorflow_session:
     # new_saver = tf.train.import_meta_graph('saved_tensorflow_sessions/tensorflow_session.meta')
     # new_saver.restore(tensorflow_session, tf.train.latest_checkpoint('saved_tensorflow_sessions/'))
     saver = tf.train.Saver()
-    players = [KerasAgent(neural_network=neural_network, tensorflow_session=tensorflow_session, decay_rate=1.0),
-               KerasAgent(neural_network=neural_network, tensorflow_session=tensorflow_session, decay_rate=0.00),
-               KerasAgent(neural_network=neural_network, tensorflow_session=tensorflow_session, decay_rate=0.000),
-               KerasAgent(neural_network=neural_network, tensorflow_session=tensorflow_session, decay_rate=0.0000)]
+    players = [KerasAgent(neural_network=neural_network, tensorflow_session=tensorflow_session, decay_rate=1.),
+               KerasAgent(neural_network=neural_network, tensorflow_session=tensorflow_session, decay_rate=0.001),
+               KerasAgent(neural_network=neural_network, tensorflow_session=tensorflow_session, decay_rate=0.00001),
+               KerasAgent(neural_network=neural_network, tensorflow_session=tensorflow_session, decay_rate=0.000001)]
     # simulator = RandomGameSimulator(
     #                     number_of_games_per_cycle=20,
     #                     number_of_update_cycles=20,
@@ -30,8 +30,8 @@ with tf.Session() as tensorflow_session:
     #                     thread_count=10)
     # simulator.run_cycles()
     playsim = KerasSimulator(players=players,
-                        number_of_games_per_cycle=20,
-                        number_of_update_cycles=500,
+                        number_of_games_per_cycle=200,
+                        number_of_update_cycles=5000,
                         neural_network=neural_network,
                         update_rate=0.1,
                         tensorflow_session=tensorflow_session)

@@ -5,6 +5,7 @@ from logic.cards import cards_to_vector, suits_to_vector, Suit
 import matplotlib.pyplot as plt
 import time
 from logic.simulator import Simulator
+import sys
 
 class KerasSimulator(Simulator):
 
@@ -46,8 +47,11 @@ class KerasSimulator(Simulator):
                 #                                                  self.neural_network.target_Q: targets,
                 #                                                  self.neural_network.action_: actions})
 
-                for s,a,r,ns,fs,t,tv in zip(states, actions, rewards, next_states, final_states, targets, target_vecs):
-                    self.neural_network.model.fit(np.array(s).reshape((1,161)), np.array(tv).reshape((1,52)), epochs=1, verbose=False)
+                self.neural_network.model.fit(np.array(states), np.array(target_vecs), batch_size=1, epochs=1, verbose=False)
+
+                # for s,a,r,ns,fs,t,tv in zip(states, actions, rewards, next_states, final_states, targets, target_vecs):
+                #     self.neural_network.model.fit(np.array(s).reshape((1,161)), np.array(tv).reshape((1,52)), epochs=1, verbose=False)
 
             self.losses.append(-1)
             print("----------------- EPOCH {} -----------------".format(m))
+            sys.stdout.flush()
