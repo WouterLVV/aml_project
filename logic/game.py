@@ -10,11 +10,12 @@ class Hearts:
         self.broken = False
         self.scores = [None]*4
         num_players = len(players)
+        self.lowest_clubs = deck.lowest_of_suit(Suit.CLUBS)
 
         hands = deck.deal(num_players, destructive=False)
         for i, cards in enumerate(hands):
             self.players[i].receive_hand(cards)
-            if TWOOFCLUBS in cards:
+            if self.lowest_clubs in cards:
                 self.first_player = i
 
     def play_round(self, verbose=False):
@@ -40,11 +41,11 @@ class Hearts:
                 print("{} got {} points!".format(player.name, self.scores[i]))
             player.reset(deck=self.deck)
 
-    def play_game(self):
+    def play_game(self, verbose = False):
         num_rounds = len(self.deck) // len(self.players)
         for i in range(num_rounds):
-            self.play_round()
-        self.finish()
+            self.play_round(verbose=verbose)
+        self.finish(verbose=verbose)
         return self
 
 

@@ -38,7 +38,8 @@ class Agent:
             if card.suit == Suit.HEARTS:
                 self.points += 1
             if card == QUEENOFSPADES:
-                self.points += 13
+                # self.points += 13
+                self.points += 8
 
     def make_move(self, table, player_id):
         attempted_card = None

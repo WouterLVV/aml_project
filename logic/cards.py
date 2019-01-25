@@ -102,10 +102,12 @@ class Card:
         return str(self.rank) + str(self.suit)
 
     def __eq__(self, other):
+        if not isinstance(other, Card):
+            return False
         return self.rank == other.rank and self.suit == other.suit
 
     def __ne__(self, other):
-        return self.rank != other.rank or self.suit != other.suit
+        return not self.__eq__(other)
 
     def __lt__(self, other):
         if isinstance(other, Card):
@@ -215,6 +217,14 @@ class Deck:
 
         return handlist
 
+    def lowest_of_suit(self, suit):
+        lowest = None
+        for card in self.cardlist:
+            if card.suit == suit and (None == lowest or card < lowest):
+                lowest = card
+        return lowest
+
+
     @staticmethod
     def gen_default(min_suit=1, max_suit=4, min_rank=2, max_rank=14, card_class=Card, allow_duplicates=False):
         max_suit += 1
@@ -237,7 +247,7 @@ STANDARDDECK = Deck.gen_default()
 CARD2NUM = dict([(b,a) for a,b in enumerate(STANDARDDECK.cardlist)])
 NUM2CARD = dict([(a,b) for a,b in enumerate(STANDARDDECK.cardlist)])
 TICHUDECK = Deck.gen_tichu()
-
+SMALLDECK = Deck.gen_default(min_suit=2, max_suit=4, min_rank=7, max_rank=14)
 
 def suits_to_vector(suits):
     vector = np.zeros((5,), dtype=np.bool)
