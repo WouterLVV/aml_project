@@ -25,15 +25,15 @@ if __name__ == '__main__':
             variable_initializer = tf.global_variables_initializer()
             tensorflow_session.run(variable_initializer)
 
-        ml_players = [ml_agent(neural_network=neural_network, tensorflow_session=tensorflow_session, decay_rate=10.000),
-                      ml_agent(neural_network=neural_network, tensorflow_session=tensorflow_session, decay_rate=10.000),
-                      ml_agent(neural_network=neural_network, tensorflow_session=tensorflow_session, decay_rate=10.000),
-                      ml_agent(neural_network=neural_network, tensorflow_session=tensorflow_session, decay_rate=10.000)]
-        mixed_players = [ml_agent(neural_network=neural_network, tensorflow_session=tensorflow_session, decay_rate=1.000),
-                         YoloAI(),
-                         YoloAI(),
-                         YoloAI()]
-        yolo_players = [YoloAI(), YoloAI(), YoloAI(), YoloAI()]
+        ml_players = [ml_agent(neural_network=neural_network, tensorflow_session=tensorflow_session, decay_rate=10.000, deck=SMALLDECK),
+                      ml_agent(neural_network=neural_network, tensorflow_session=tensorflow_session, decay_rate=10.000, deck=SMALLDECK),
+                      ml_agent(neural_network=neural_network, tensorflow_session=tensorflow_session, decay_rate=10.000, deck=SMALLDECK),
+                      ml_agent(neural_network=neural_network, tensorflow_session=tensorflow_session, decay_rate=10.000, deck=SMALLDECK)]
+        mixed_players = [ml_agent(neural_network=neural_network, tensorflow_session=tensorflow_session, decay_rate=1.000, deck=SMALLDECK),
+                         YoloAI(deck=SMALLDECK),
+                         YoloAI(deck=SMALLDECK),
+                         YoloAI(deck=SMALLDECK)]
+        yolo_players = [YoloAI(deck=SMALLDECK), YoloAI(deck=SMALLDECK), YoloAI(deck=SMALLDECK), YoloAI(deck=SMALLDECK)]
         simulator_random_deck = RandomGameSimulator(
                             number_of_games_per_cycle=500,
                             number_of_update_cycles=2000,

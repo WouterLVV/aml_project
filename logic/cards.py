@@ -244,30 +244,60 @@ class Deck:
 
 
 STANDARDDECK = Deck.gen_default()
-CARD2NUM = dict([(b,a) for a,b in enumerate(STANDARDDECK.cardlist)])
-NUM2CARD = dict([(a,b) for a,b in enumerate(STANDARDDECK.cardlist)])
+
 TICHUDECK = Deck.gen_tichu()
 SMALLDECK = Deck.gen_default(min_suit=2, max_suit=4, min_rank=7, max_rank=14)
 
-def suits_to_vector(suits):
-    vector = np.zeros((5,), dtype=np.bool)
-    for suit in suits:
-        vector[suit.value] = 1
-    return vector
+
+use_small_deck = True
+
+if not use_small_deck:
+    CARD2NUM = dict([(b, a) for a, b in enumerate(STANDARDDECK.cardlist)])
+    NUM2CARD = dict([(a, b) for a, b in enumerate(STANDARDDECK.cardlist)])
+    def suits_to_vector(suits):
+        vector = np.zeros((5,), dtype=np.bool)
+        for suit in suits:
+            vector[suit.value] = 1
+        return vector
 
 
-def cards_to_vector(cards):
-    vector = np.zeros((52,), dtype=np.bool)
-    for i in cards:
-        if i is None:
-            continue
-        vector[CARD2NUM[i]] = 1
-    return vector
+    def cards_to_vector(cards):
+        vector = np.zeros((52,), dtype=np.bool)
+        for i in cards:
+            if i is None:
+                continue
+            vector[CARD2NUM[i]] = 1
+        return vector
 
 
-def vector_to_cards(vector):
-    cards = []
-    for i,v in enumerate(vector):
-        if v == 1:
-            cards.append(NUM2CARD[i])
-    return cards
+    def vector_to_cards(vector):
+        cards = []
+        for i,v in enumerate(vector):
+            if v == 1:
+                cards.append(NUM2CARD[i])
+        return cards
+else:
+    CARD2NUM = dict([(b, a) for a, b in enumerate(SMALLDECK.cardlist)])
+    NUM2CARD = dict([(a, b) for a, b in enumerate(SMALLDECK.cardlist)])
+    def suits_to_vector(suits):
+        vector = np.zeros((4,), dtype=np.bool)
+        for suit in suits:
+            vector[suit.value-1 if suit.value > 0 else suit.value] = 1
+        return vector
+
+
+    def cards_to_vector(cards):
+        vector = np.zeros((24,), dtype=np.bool)
+        for i in cards:
+            if i is None:
+                continue
+            vector[CARD2NUM[i]] = 1
+        return vector
+
+
+    def vector_to_cards(vector):
+        cards = []
+        for i, v in enumerate(vector):
+            if v == 1:
+                cards.append(NUM2CARD[i])
+        return cards
