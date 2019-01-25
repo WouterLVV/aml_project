@@ -6,6 +6,7 @@ from logic.agent import RandomAI
 from logic.game import Hearts
 from multiprocessing import Pool
 import time
+from logic.cards import STANDARDDECK, SMALLDECK
 
 
 def run_wrapper(game):
@@ -13,7 +14,7 @@ def run_wrapper(game):
 
 
 class Simulator:
-    def __init__(self, players, number_of_games_per_cycle, number_of_update_cycles, neural_network, future_reward_factor, tensorflow_session):
+    def __init__(self, players, number_of_games_per_cycle, number_of_update_cycles, neural_network, future_reward_factor, tensorflow_session, deck=STANDARDDECK):
         self.players = players
         self.number_of_update_cycles = number_of_update_cycles
         self.number_of_games = number_of_games_per_cycle
@@ -25,10 +26,11 @@ class Simulator:
         self.losses = []
         self.game_count = 0
         self.tensorflow_session = tensorflow_session
+        self.deck = deck
 
     def run_games(self):
         for _ in range(self.number_of_games):
-            hearts = Hearts(players=self.players)
+            hearts = Hearts(players=self.players, deck=self.deck)
             hearts.play_game()
             self.game_count += 1
             self.player_wins[hearts.winning_player()] += 1
@@ -88,7 +90,10 @@ class Simulator:
         rewards = np.array([round_history["reward"][player_id] for round_history in history])
         final_states = np.array([round_history["final"][player_id] for round_history in history])
 
-        next_states = [None if x % 13 == 12 else states[x+1] for x in range(len(states))]
+        if self.deck == STANDARDDECK:
+            next_states = [None if x % 13 == 12 else states[x + 1] for x in range(len(states))]
+        else:
+            next_states = [None if x % 6 == 5 else states[x + 1] for x in range(len(states))]
         return [states, actions, rewards, next_states, final_states]
 
     def reset_games(self):
@@ -107,14 +112,15 @@ class Simulator:
 
 
 class RandomGameSimulator(Simulator):
-    def __init__(self, number_of_games_per_cycle, number_of_update_cycles, neural_network, future_reward_factor, tensorflow_session, thread_count, random_from_deck_instead_of_hand=True):
-        Simulator.__init__(self, [RandomAI(random_from_deck_instead_of_hand=random_from_deck_instead_of_hand) for _ in range(4)], number_of_games_per_cycle, number_of_update_cycles, neural_network, future_reward_factor, tensorflow_session)
+    def __init__(self, number_of_games_per_cycle, number_of_update_cycles, neural_network, future_reward_factor, tensorflow_session, thread_count, random_from_deck_instead_of_hand=True, deck=STANDARDDECK):
+        Simulator.__init__(self, [RandomAI(random_from_deck_instead_of_hand=random_from_deck_instead_of_hand, deck=deck) for _ in range(4)], number_of_games_per_cycle, number_of_update_cycles, neural_network, future_reward_factor, tensorflow_session, STANDARDDECK)
         self.thread_count = thread_count
         self.random_from_deck_instead_of_hand = random_from_deck_instead_of_hand
+        self.deck = deck
 
     def run_games(self):
         if self.thread_count > 1:
-            games = [Hearts(players=[RandomAI(random_from_deck_instead_of_hand=self.random_from_deck_instead_of_hand) for _ in range(4)]) for _ in range(self.number_of_games)]
+            games = [Hearts(players=[RandomAI(random_from_deck_instead_of_hand=self.random_from_deck_instead_of_hand, deck=self.deck) for _ in range(4)]) for _ in range(self.number_of_games)]
             pool = Pool(processes=self.thread_count)
             games = pool.map(run_wrapper, games)
             pool.close()
