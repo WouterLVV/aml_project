@@ -13,6 +13,7 @@ class Agent:
         self.suit_counter = dict()
         self.name = "Ultimate AI"
         self.have_two_of_clubs = False
+        self.QoS_worth = len(deck)//len(deck.suits)
         for s in deck.suits:
             self.suit_counter[s] = 0
 
@@ -39,7 +40,7 @@ class Agent:
                 self.points += 1
             if card == QUEENOFSPADES:
                 # self.points += 13
-                self.points += 8
+                self.points += self.QoS_worth
 
     def make_move(self, table, player_id):
         attempted_card = None
