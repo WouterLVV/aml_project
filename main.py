@@ -13,11 +13,11 @@ if __name__ == '__main__':
 
     start_time = time.time()
     with tf.Session() as tensorflow_session:
-        neural_network = DQNetwork(state_size=24,
+        neural_network = DQNetwork(state_size=52,
                                    action_size=24,
-                                   hidden_sizes=[],
-                                   layer_activation_functions=['lin'],
-                                   learning_rate=0.0002)
+                                   hidden_sizes=[36, 24],
+                                   layer_activation_functions=['tanh', 'tanh', 'lin'],
+                                   learning_rate=0.0000001)
         saver = tf.train.Saver()
         if load_previously_trained_network:
             saver.restore(tensorflow_session, tf.train.latest_checkpoint('saved_tensorflow_sessions/'))
@@ -45,7 +45,7 @@ if __name__ == '__main__':
                             deck=SMALLDECK)
         simulator_random = RandomGameSimulator(
                             number_of_games_per_cycle=200,
-                            number_of_update_cycles=1000,
+                            number_of_update_cycles=2000,
                             neural_network=neural_network,
                             future_reward_factor=0.9,
                             tensorflow_session=tensorflow_session,
@@ -66,11 +66,11 @@ if __name__ == '__main__':
                                      future_reward_factor=0.1,
                                      tensorflow_session=tensorflow_session,
                                      deck=SMALLDECK)
-        # simulator_random_deck.run_cycles()
-        # simulator_random.run_cycles()
-        # simulator_yolo.run_cycles()
-        # simulator_player.run_cycles()
-        simulator_player.run_games()
+        simulator_random_deck.run_cycles()
+        simulator_random.run_cycles()
+        simulator_yolo.run_cycles()
+        simulator_player.run_cycles()
+        # simulator_player.run_games()
         # vars_ = tf.trainable_variables()
         # vars_vals = tensorflow_session.run(vars_)
         # for var, val in zip(vars_, vars_vals):
@@ -88,9 +88,9 @@ if __name__ == '__main__':
         # for var, val in zip(vars_, vars_vals):
         #     print("var: {}, value: {}".format(var.name, val))
         # simulator_player.run_games()
-        saver.save(tensorflow_session, './saved_tensorflow_sessions/simplified_hearts')
-        print("Only clubs")
-        print(np.array(tensorflow_session.run(neural_network.output, feed_dict={neural_network.inputs_: [[1]*6+[0]*18]})))
+        saver.save(tensorflow_session, './saved_tensorflow_sessions/simplified_hearts_valid')
+        # print("Only clubs")
+        # print(np.array(tensorflow_session.run(neural_network.output, feed_dict={neural_network.inputs_: [[1]*6+[0]*18]})))
 
     end_time = time.time()
     t = end_time-start_time

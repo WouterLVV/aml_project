@@ -47,7 +47,7 @@ class Agent:
         card = self.pick_card(table, player_id)
         if not self.check_valid(card, table):
             if card in self.hand:
-                self.points += 0
+                self.points += 150
             else:
                 self.points += 500
             options = self.determine_valid_options(table)
