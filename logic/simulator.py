@@ -68,8 +68,8 @@ class Simulator:
                 action_vector_based_on_order_of_play = np.concatenate((round_.cards[round_.first_player_id:], round_.cards[:round_.first_player_id]))
                 table_vector = [np.zeros((52,), dtype=np.bool) if k == 0 else cards_to_vector(action_vector_based_on_order_of_play[:k]) for k in range(4)]
                 first_suit_vector = [suits_to_vector([round_.first_suit]) if round_.first_player_id == x else suits_to_vector([Suit(0)]) for x in range(4)]
-                state_vector = hands_vector #[np.concatenate(p) for p in zip(hands_vector, discard_vector, table_vector, first_suit_vector)]
-
+                #state_vector = [np.concatenate(p) for p in zip(hands_vector, first_suit_vector)]
+                state_vector = hands_vector
                 reward_vector = round_.rewards
 
                 final_states_vector = [True]*4 if len(round_.hands[0]) == 1 else [False]*4

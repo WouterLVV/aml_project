@@ -28,7 +28,7 @@ class KerasNetwork:
         # self.model.add(Dense(100, activation='tanh'))
         # self.model.add(Dense(100, activation='tanh'))
         self.model.add(Dense(self.action_size, activation='linear'))
-        self.model.compile(loss='mse', optimizer='adam', metrics=['mae'])
+        self.model.compile(loss='mse', optimizer='adam', metrics=['mse'])
 
 
 

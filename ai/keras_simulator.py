@@ -57,3 +57,10 @@ class KerasSimulator(Simulator):
             # self.losses.append(-1)
             print("----------------- EPOCH {} -----------------".format(m))
             sys.stdout.flush()
+
+    def plot_losses(self):
+        plt.plot(range(len(self.losses)), [h.history['mean_squared_error'] for h in self.losses])
+        plt.title('Value loss function per cycle')
+        plt.xlabel('Number of cycles')
+        plt.ylabel('Value loss function')
+        plt.show()
