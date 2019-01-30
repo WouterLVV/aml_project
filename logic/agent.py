@@ -44,9 +44,9 @@ class Agent:
         card = self.pick_card(table, player_id)
         toremove = card
         if not self.check_valid(card, table):
-            self.points += 50
+            self.points += 2
         if toremove not in self.cardset:
-            self.points += 50
+            self.points += 100
             toremove = self.hand[random.randrange(0,len(self.hand))]
         self.hand.remove(toremove)
         self.suit_counter[toremove.suit] -= 1

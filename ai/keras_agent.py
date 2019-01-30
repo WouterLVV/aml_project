@@ -31,7 +31,8 @@ class KerasAgent(Agent):
         table_vector = cards_to_vector(table.cards)
         discard_vector = cards_to_vector(table.combined_discardpile)
         first_suit_vector = suits_to_vector([table.first_suit])
-        return np.concatenate((hands_vector, table_vector, discard_vector, first_suit_vector))
+        return hands_vector
+        #return np.concatenate((hands_vector, table_vector, discard_vector, first_suit_vector))
 
     def get_exploration_rate(self):
         return np.exp(-self.decay_rate*self.games_played)
@@ -46,7 +47,7 @@ class KerasAgent(Agent):
             #print("Picking random card")
             card = options[random.randrange(0, len(options))]
         else:
-            choices = self.neural_network.model.predict(state.reshape((1,161)), batch_size=1)
+            choices = self.neural_network.model.predict(state.reshape((1,52)), batch_size=1)
             choice = np.argmin((choices+1000))
             card = NUM2CARD[choice]
         return card

@@ -25,8 +25,8 @@ class KerasNetwork:
 
         self.model = Sequential()
         self.model.add(InputLayer(input_shape=(self.state_size,), batch_size=1))
-        self.model.add(Dense(100, activation='tanh'))
-        self.model.add(Dense(100, activation='tanh'))
+        # self.model.add(Dense(100, activation='tanh'))
+        # self.model.add(Dense(100, activation='tanh'))
         self.model.add(Dense(self.action_size, activation='linear'))
         self.model.compile(loss='mse', optimizer='adam', metrics=['mae'])
 

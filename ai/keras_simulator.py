@@ -34,11 +34,12 @@ class KerasSimulator(Simulator):
                 #     self.tensorflow_session.run(self.neural_network.output,
                 #                                 feed_dict={self.neural_network.inputs_: np.array([ns])}))
                 #            for (r, f, ns) in zip(rewards, final_states, next_states)]
-                targets = [r if f else r + self.update_rate * np.min(
-                           self.neural_network.model.predict(np.array(ns).reshape((1,161))))
-                           for (r, f, ns) in zip(rewards, final_states, next_states)]
+                #targets = [r if True else r + self.update_rate * np.min(
+                           # self.neural_network.model.predict(np.array(ns).reshape((1,52))))
+                           # for (r, f, ns) in zip(rewards, final_states, next_states)]
 
-                target_vecs = [self.neural_network.model.predict(state.reshape((1,161)))[0] for state in states ]
+                targets = rewards
+                target_vecs = [self.neural_network.model.predict(state.reshape((1,52)))[0] for state in states ]
                 for vec, action, target in zip(target_vecs, actions, targets):
                     vec[action] = target
 
@@ -47,11 +48,12 @@ class KerasSimulator(Simulator):
                 #                                                  self.neural_network.target_Q: targets,
                 #                                                  self.neural_network.action_: actions})
 
-                self.neural_network.model.fit(np.array(states), np.array(target_vecs), batch_size=1, epochs=1, verbose=False)
+                loss = self.neural_network.model.fit(np.array(states), np.array(target_vecs), batch_size=1, epochs=1, verbose=False)
+                self.losses.append(loss)
 
                 # for s,a,r,ns,fs,t,tv in zip(states, actions, rewards, next_states, final_states, targets, target_vecs):
                 #     self.neural_network.model.fit(np.array(s).reshape((1,161)), np.array(tv).reshape((1,52)), epochs=1, verbose=False)
 
-            self.losses.append(-1)
+            # self.losses.append(-1)
             print("----------------- EPOCH {} -----------------".format(m))
             sys.stdout.flush()

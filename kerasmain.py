@@ -9,7 +9,7 @@ import tensorflow as tf
 
 start_time = time.time()
 with tf.Session() as tensorflow_session:
-    neural_network = KerasNetwork(state_size=161,
+    neural_network = KerasNetwork(state_size=52,
                                action_size=52,
                                hidden_sizes=[100, 100, 100],
                                layer_activation_functions=['tanh', 'tanh', 'tanh', 'linear'],
@@ -30,8 +30,8 @@ with tf.Session() as tensorflow_session:
     #                     thread_count=10)
     # simulator.run_cycles()
     playsim = KerasSimulator(players=players,
-                        number_of_games_per_cycle=200,
-                        number_of_update_cycles=5000,
+                        number_of_games_per_cycle=20,
+                        number_of_update_cycles=500,
                         neural_network=neural_network,
                         update_rate=0.1,
                         tensorflow_session=tensorflow_session)
@@ -41,5 +41,5 @@ with tf.Session() as tensorflow_session:
 end_time = time.time()
 t = end_time-start_time
 print("Total time taken: {}".format(t))
-# print("Average time per game: {}". format(t/(simulator.number_of_games*simulator.number_of_update_cycles)))
-# simulator.plot_losses()
+print("Average time per game: {}". format(t/(playsim.number_of_games*simulator.number_of_update_cycles)))
+playsim.plot_losses()
