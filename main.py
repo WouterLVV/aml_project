@@ -5,7 +5,6 @@ from logic.agent import YoloAI
 from logic.cards import SMALLDECK, STANDARDDECK
 import time
 import tensorflow as tf
-import numpy as np
 
 
 if __name__ == '__main__':
@@ -56,26 +55,32 @@ if __name__ == '__main__':
                                    number_of_games_per_cycle=200,
                                    number_of_update_cycles=250,
                                    neural_network=neural_network,
-                                   future_reward_factor=0.001,
+                                   future_reward_factor=0.9,
                                    tensorflow_session=tensorflow_session,
                                    deck=SMALLDECK)
         simulator_player = Simulator(players=ml_players,
                                      number_of_games_per_cycle=20,
                                      number_of_update_cycles=1,
                                      neural_network=neural_network,
-                                     future_reward_factor=0.1,
+                                     future_reward_factor=0.9,
                                      tensorflow_session=tensorflow_session,
                                      deck=SMALLDECK)
         simulator_random_deck.run_cycles()
         simulator_random.run_cycles()
         simulator_yolo.run_cycles()
         simulator_player.run_cycles()
-        # simulator_player.run_games()
+
+        ## --------------
+        # Print existing tensorflow variables
+        ## --------------
         # vars_ = tf.trainable_variables()
         # vars_vals = tensorflow_session.run(vars_)
         # for var, val in zip(vars_, vars_vals):
         #     print("var: {}, value: {}".format(var.name, val))
-        # simulator_player.run_games()
+
+        ## --------------
+        # Overwrite tensorflow tensors
+        ## --------------
         # with tf.variable_scope("DQNetwork", reuse=True):
         #     w = tf.get_variable('w0')
         #     p = w.assign([[1]*52 if x<52 else [0]*52 for x in range(161)])
@@ -83,20 +88,35 @@ if __name__ == '__main__':
         #     q = b.assign([1]*52)
         #     tensorflow_session.run(p)
         #     tensorflow_session.run(q)
+
+        ## --------------
+        # Print existing tensorflow variables
+        ## --------------
         # vars_ = tf.trainable_variables()
         # vars_vals = tensorflow_session.run(vars_)
         # for var, val in zip(vars_, vars_vals):
         #     print("var: {}, value: {}".format(var.name, val))
-        # simulator_player.run_games()
+
         saver.save(tensorflow_session, './saved_tensorflow_sessions/simplified_hearts_valid')
-        # print("Only clubs")
+
+        ## --------------
+        # Print result for only clubs configuration
+        ## --------------
         # print(np.array(tensorflow_session.run(neural_network.output, feed_dict={neural_network.inputs_: [[1]*6+[0]*18]})))
 
     end_time = time.time()
     t = end_time-start_time
     print("Total time taken: {}".format(t))
+
+    ## --------------
+    # Print performance of players in simulator_player
+    ## --------------
     # print(simulator_player.player_wins)
     # print(simulator_player.player_losses)
+
+    ## --------------
+    # Plot losses of training
+    ## --------------
     simulator_random_deck.plot_losses()
     simulator_random.plot_losses()
     simulator_yolo.plot_losses()

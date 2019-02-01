@@ -2,7 +2,6 @@ from logic.agent import Agent
 from logic.cards import STANDARDDECK, cards_to_vector, suits_to_vector, NUM2CARD
 import random
 import numpy as np
-import tensorflow as tf
 
 
 class ml_agent(Agent):
@@ -24,10 +23,20 @@ class ml_agent(Agent):
             card = options[random.randrange(0, len(options))]
             print("Picking random card {}".format(card.ascii_str()))
         else:
+            ## --------------
+            # Get Q values of network for given state
+            ## --------------
             choices = np.array(self.tensorflow_session.run(self.neural_network.output, feed_dict={self.neural_network.inputs_: [state]}))
-            # choice = np.argmin(np.array(self.tensorflow_session.run(self.neural_network.output, feed_dict={self.neural_network.inputs_: [state]})))
-            # choice = np.argmin(choices+np.array([np.inf if x == 0 else 0 for x in cards_to_vector(options)]))
+
+            ## --------------
+            # select lowest Q value
+            ## --------------
             choice = np.argmin(choices)
+
+            ## --------------
+            # prefilter on valid actions
+            ## --------------
+            # choice = np.argmin(choices+np.array([np.inf if x == 0 else 0 for x in cards_to_vector(options)]))
             card = NUM2CARD[choice]
         return card
 
@@ -36,8 +45,20 @@ class ml_agent(Agent):
         table_vector = cards_to_vector(table.cards)
         discard_vector = cards_to_vector(table.combined_discardpile)
         first_suit_vector = suits_to_vector([table.first_suit])
+
+        ## --------------
+        # return partial state used for valid card training
+        ## --------------
         return np.concatenate((hands_vector, table_vector, first_suit_vector))
+
+        ## --------------
+        # return partial state used for hand card training
+        ## --------------
         # return hands_vector
+
+        ## --------------
+        # return full state used for good card training
+        ## --------------
         # return np.concatenate((hands_vector, table_vector, discard_vector, first_suit_vector))
 
     def get_exploration_rate(self):

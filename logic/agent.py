@@ -87,12 +87,6 @@ class Agent:
         return valid_options
 
     def end_game(self):
-        # # MOVED TO win_cards
-        # for card in self.won_cards:
-        #     if card.suit == Suit.HEARTS:
-        #         self.points += 1
-        #     if card == QUEENOFSPADES:
-        #         self.points += 13
         return self.points
 
 

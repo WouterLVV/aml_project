@@ -1,4 +1,3 @@
-import tensorflow as tf
 import matplotlib.pyplot as plt
 import numpy as np
 from logic.cards import cards_to_vector, suits_to_vector, Suit
@@ -53,9 +52,21 @@ class Simulator:
 
             for i in range(len(self.players)):
                 states, actions, rewards, next_states, final_states = self.separate_history(history, player_id=i)
+                ## --------------
+                # Assign the targets using a future_reward_factor of 0
+                ## --------------
                 targets = rewards
+
+                ## --------------
+                # Assign the targets properly
+                ## --------------
                 # targets = [r if f else r+self.future_reward_factor*np.min(self.tensorflow_session.run(self.neural_network.output, feed_dict={self.neural_network.inputs_: np.array([ns])})) for (r, f, ns) in zip(rewards, final_states, next_states)]
+
+                ## --------------
+                # Assign the targets based on only valid actions
+                ## --------------
                 # targets = [r if f else r+self.future_reward_factor*np.min(self.tensorflow_session.run(self.neural_network.output, feed_dict={self.neural_network.inputs_: np.array([ns])})+np.array([np.inf if x == 0 else 0 for x in ns[0:52]])) for (r, f, ns) in zip(rewards, final_states, next_states)]
+
                 loss, _ = self.tensorflow_session.run([self.neural_network.loss, self.neural_network.optimizer],
                                                       feed_dict={self.neural_network.inputs_: states,
                                                                  self.neural_network.target_Q: targets,
@@ -74,8 +85,21 @@ class Simulator:
                 action_vector_based_on_order_of_play = np.concatenate((round_.cards[round_.first_player_id:], round_.cards[:round_.first_player_id]))
                 table_vector = [np.zeros((24,), dtype=np.bool) if k == 0 else cards_to_vector(action_vector_based_on_order_of_play[:k]) for k in range(4)]
                 first_suit_vector = [suits_to_vector([round_.first_suit]) if round_.first_player_id == x else suits_to_vector([Suit(0)]) for x in range(4)]
-                # state_vector = [np.concatenate(p) for p in zip(hands_vector, discard_vector, table_vector, first_suit_vector)]
+
+                ## --------------
+                # Get state for good cards
+                ## --------------
+                state_vector = [np.concatenate(p) for p in zip(hands_vector, discard_vector, table_vector, first_suit_vector)]
+
+                ## --------------
+                # Get state for valid cards
+                ## --------------
                 state_vector = [np.concatenate(p) for p in zip(hands_vector, table_vector, first_suit_vector)]
+
+                ## --------------
+                # Get state for hand cards
+                ## --------------
+                state_vector = hands_vector
 
                 reward_vector = round_.rewards
 
