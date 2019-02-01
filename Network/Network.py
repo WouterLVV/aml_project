@@ -1,6 +1,4 @@
 import tensorflow as tf
-import pickle
-import os
 
 
 class DQNetwork:
@@ -70,11 +68,15 @@ class DQNetwork:
             del self.hidden_sizes[-1]
             self.output = input_
 
+            ## --------------
             # Q is our predicted Q value.
+            ## --------------
             self.Q = tf.reduce_sum(tf.multiply(self.output, self.action_))
 
+            ## --------------
             # The loss is the difference between our predicted Q_values and the Q_target
             # Sum(Qtarget - Q)^2
+            ## --------------
             self.loss = tf.reduce_mean(tf.square(self.target_Q - self.Q))
 
             self.optimizer = tf.train.AdamOptimizer(self.learning_rate).minimize(self.loss)
@@ -84,13 +86,3 @@ class DQNetwork:
         return tf.get_variable(name=name,
                                shape=shape,
                                initializer=tf.random_normal_initializer(stddev=0.001))
-
-    # def pickle(self):
-    #     with open(self.name, 'wb') as f:
-    #         pickle.dump(self, f, pickle.HIGHEST_PROTOCOL)
-    #
-    # @staticmethod
-    # def unpickle(name='DQNetwork'):
-    #     with open(name, 'rb') as f:
-    #         # print(os.path.abspath(name))
-    #         return pickle.load(f)
