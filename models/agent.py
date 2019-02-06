@@ -1,9 +1,10 @@
-from logic.cards import Suit, QUEENOFSPADES, TWOOFCLUBS, STANDARDDECK
+from models.suits import Suit
+from Games.Hearts.hearts import HEARTSDECK, QUEENOFSPADES, TWOOFCLUBS
 import random
 
 
 class Agent:
-    def __init__(self, deck=STANDARDDECK):
+    def __init__(self, deck=HEARTSDECK):
         self.hand = []
         self.cardset = set()
         self.deck = deck
@@ -35,11 +36,13 @@ class Agent:
 
     def win_cards(self, cards):
         self.won_cards.extend(cards)
-        for card in cards:
+        self.update_score()
+
+    def update_score(self):
+        for card in self.won_cards:
             if card.suit == Suit.HEARTS:
                 self.points += 1
             if card == QUEENOFSPADES:
-                # self.points += 13
                 self.points += self.QoS_worth
 
     def make_move(self, table, player_id):
@@ -91,7 +94,7 @@ class Agent:
 
 
 class HumanPlayer(Agent):
-    def __init__(self, deck=STANDARDDECK, ask_name=False):
+    def __init__(self, deck=HEARTSDECK, ask_name=False):
         super(HumanPlayer, self).__init__(deck)
         if ask_name:
             self.name = input("Your Name: ")
@@ -122,7 +125,7 @@ class HumanPlayer(Agent):
 
 class RandomAI(Agent):
 
-    def __init__(self, deck=STANDARDDECK, random_from_deck_instead_of_hand=True):
+    def __init__(self, deck=HEARTSDECK, random_from_deck_instead_of_hand=True):
         super(RandomAI, self).__init__(deck)
         self.name = "RetardedAI#" + str(random.randrange(0,1000))
         self.random_from_deck_instead_of_hand = random_from_deck_instead_of_hand
@@ -141,7 +144,7 @@ class RandomAI(Agent):
 
 class YoloAI(Agent):
 
-    def __init__(self, deck=STANDARDDECK):
+    def __init__(self, deck=HEARTSDECK):
         super(YoloAI, self).__init__(deck)
         self.name = "RetardedAI#" + str(random.randrange(0,1000))
 
