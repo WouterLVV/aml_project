@@ -8,7 +8,7 @@ from models.data_transformer import STANDARDDATATRANSFORMER
 
 
 class Agent:
-    def __init__(self, deck=HEARTSDECK):
+    def __init__(self, deck=STANDARDDECK):
         self.hand = []
         self.cardset = set()
         self.deck = deck
@@ -98,7 +98,7 @@ class Agent:
 
 
 class HumanPlayer(Agent):
-    def __init__(self, deck=HEARTSDECK, ask_name=False):
+    def __init__(self, deck=STANDARDDECK, ask_name=False):
         super(HumanPlayer, self).__init__(deck)
         if ask_name:
             self.name = input("Your Name: ")
@@ -226,13 +226,13 @@ class NeuralNetworkAgent(Agent):
         table_vector = self.datatransformer_klass.cards_to_vector(table.cards)
         discard_vector = self.datatransformer_klass.cards_to_vector(table.combined_discardpile)
         first_suit_vector = self.datatransformer_klass.suits_to_vector([table.first_suit])
-        return hands_vector
+        return np.concatenate((hands_vector, first_suit_vector))
 
     def calculate_actions(self, state):
         pass
 
     def best_action(self, actions):
-        pass
+        return np.argmin(actions)
 
     def get_exploration_rate(self):
         return np.exp(-self.decay_rate * self.games_played)
@@ -285,4 +285,6 @@ class KerasAgent(NeuralNetworkAgent):
                                          datatransformer_klass=datatransformer_klass)
 
     def calculate_actions(self, state):
-        return self.neural_network.model.predict(state.reshape((1, 52)), batch_size=1)
+        A = self.neural_network.model.predict(np.array([state]), batch_size=1)
+        print(A)
+        return A

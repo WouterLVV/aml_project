@@ -2,7 +2,7 @@ import tensorflow as tf
 import numpy as np
 from tensorflow.python.keras import Sequential
 from tensorflow.python.keras.engine import InputLayer
-from tensorflow.python.keras.layers import Dense
+from tensorflow.python.keras.layers import Dense, Dropout
 from tensorflow.python.keras.models import save_model, load_model
 
 
@@ -115,7 +115,7 @@ class KerasNetwork:
             except AssertionError:
                 print("Network needs to know at least state_size, actionsize, and have an output_activation_function")
             try:
-                if hidden_activation_functions is not None and hidden_sizes is not None:
+                if hidden_activation_functions is not None or hidden_sizes is not None:
                     assert len(hidden_activation_functions) == len(hidden_sizes)
             except AssertionError:
                 if len(hidden_activation_functions) > len(hidden_sizes):
@@ -123,14 +123,18 @@ class KerasNetwork:
                 else:
                     print("Too few hidden activation functions, must have length(hidden sizes) ")
                 exit(1)
+            except TypeError:
+                print("Either hidden_activation_functions or hidden_sizes is None; Make both None or neither.")
 
             self.model = Sequential()
-            self.model.add(InputLayer(input_shape=(state_size,), batch_size=1))
-            inputs = np.roll(hidden_sizes, 1)
-            inputs[0] = state_size
-            for h, i, l in zip(hidden_sizes, inputs, hidden_activation_functions):
-                self.model.add(Dense(h, input_shape=(i,), activation=l))
-            self.model.add(Dense(action_size, input_shape=(state_size,), activation=output_activation_function))
+            self.model.add(InputLayer(input_shape=(state_size,)))
+            if hidden_activation_functions is not None and hidden_sizes is not None:
+                hidden_inputs = np.roll(hidden_sizes, 1)
+                hidden_inputs[0] = state_size
+                for s, i, a in zip(hidden_sizes, hidden_inputs, hidden_activation_functions):
+                    self.model.add(Dense(s, input_dim=i, activation=a))
+                    self.model.add(Dropout(0.1))
+            self.model.add(Dense(action_size, input_dim=state_size, activation=output_activation_function))
             self.model.compile(loss='mse', optimizer='adam', metrics=['mse'])
 
     def summary(self):
@@ -143,8 +147,17 @@ class KerasNetwork:
         self.model = load_model(path)
 
     def generate_target_vecs(self, states, actions, rewards, next_states, final_states):
-        targets = rewards
-        target_vecs = [self.model.predict(state.reshape((1, 52)))[0] for state in states]
-        for vec, action, target in zip(target_vecs, actions, targets):
-            vec[action] = target
+        target_vecs = [self.model.predict(np.array([state]))[0] for state in states]
+        for vec, action, reward, next_state, final_state in zip(target_vecs, actions, rewards, next_states, final_states):
+            if final_state or self.discount_factor == 0:
+                vec[action] = reward
+            else:
+                vec[action] = reward + self.discount_factor*np.min(self.model.predict(np.array([next_state]))[0])
         return target_vecs
+
+# targets = [r if True else r + self.update_rate * np.min(
+# self.neural_network.model.predict(np.array(ns).reshape((1,52))))
+# for (r, f, ns) in zip(rewards, final_states, next_states)]
+# target_vecs = [self.neural_network.model.predict(np.array([state])) for state in states ]
+# for s,a,r,ns,fs,t,tv in zip(states, actions, rewards, next_states, final_states, targets, target_vecs):
+#     self.neural_network.model.fit(np.array(s).reshape((1,161)), np.array(tv).reshape((1,52)), epochs=1, verbose=False)
