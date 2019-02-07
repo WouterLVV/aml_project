@@ -1,4 +1,5 @@
 import numpy as np
+from models.deck import STANDARDDECK
 
 
 class DataTransformer:
@@ -11,7 +12,7 @@ class DataTransformer:
 
     def suits_to_vector(self, suits, include_suit_NONE=True):
         if include_suit_NONE:
-            vector = np.zeros((self.number_of_suits+1,), dtype=np.bool)
+            vector = np.zeros((self.number_of_suits + 1,), dtype=np.bool)
         else:
             vector = np.zeros((self.number_of_suits,), dtype=np.bool)
         for suit in suits:
@@ -32,3 +33,6 @@ class DataTransformer:
             if v == 1:
                 cards.append(self.NUM2CARD[i])
         return cards
+
+
+STANDARDDATATRANSFORMER = DataTransformer(4, 52, STANDARDDECK)

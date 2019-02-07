@@ -1,4 +1,5 @@
 import tensorflow as tf
+import numpy as np
 from tensorflow.python.keras import Sequential
 from tensorflow.python.keras.engine import InputLayer
 from tensorflow.python.keras.layers import Dense
@@ -20,7 +21,9 @@ class TensorNetwork:
         self.output; Calculate [Q(s'_1,a_1),...Q(s'_n,a_n)] with s'_i is the state after applying a_i on given input state s
         self.loss; norm 2 error function on Qhat-hat with Qhat = r + gamma*min_{a\inA} Q(s',a) where A is the set of possible action and s' the state after a round.
     """
-    def __init__(self, state_size, action_size, hidden_sizes, layer_activation_functions, learning_rate, name='DQNetwork'):
+
+    def __init__(self, state_size, action_size, hidden_sizes, layer_activation_functions, learning_rate,
+                 name='DQNetwork'):
         self.state_size = state_size
         self.action_size = action_size
         self.learning_rate = learning_rate
@@ -29,9 +32,9 @@ class TensorNetwork:
         self.name = name
 
         try:
-            assert len(self.layer_activation_functions) == len(self.hidden_sizes)+1
+            assert len(self.layer_activation_functions) == len(self.hidden_sizes) + 1
         except AssertionError:
-            if len(self.layer_activation_functions) > len(self.hidden_sizes)+1:
+            if len(self.layer_activation_functions) > len(self.hidden_sizes) + 1:
                 print("Too many activation functions, must be length(hidden sizes) +1 ")
             else:
                 print("Too few activation functions, must be length(hidden sizes) +1 ")
@@ -45,11 +48,14 @@ class TensorNetwork:
             input_ = self.inputs_
             input_size = self.state_size
             self.hidden_sizes.append(self.action_size)
-            for i, (output_size, activation_function) in enumerate(zip(self.hidden_sizes, self.layer_activation_functions)):
+            for i, (output_size, activation_function) in enumerate(
+                    zip(self.hidden_sizes, self.layer_activation_functions)):
                 if activation_function == "sigmoid":
-                    input_ = tf.nn.sigmoid(tf.matmul(input_, self.init_weights("w{}".format(i), [input_size, output_size])))
+                    input_ = tf.nn.sigmoid(
+                        tf.matmul(input_, self.init_weights("w{}".format(i), [input_size, output_size])))
                 elif activation_function == "relu":
-                    input_ = tf.nn.relu(tf.matmul(input_, self.init_weights("w{}".format(i), [input_size, output_size])))
+                    input_ = tf.nn.relu(
+                        tf.matmul(input_, self.init_weights("w{}".format(i), [input_size, output_size])))
                 elif activation_function == "elu":
                     input_ = tf.nn.elu(tf.matmul(input_, self.init_weights(str(i), [input_size, output_size])))
                 elif activation_function == "softplus":
@@ -59,7 +65,8 @@ class TensorNetwork:
                 elif activation_function == "softmax":
                     input_ = tf.nn.softmax(tf.matmul(input_, self.init_weights(str(i), [input_size, output_size])))
                 elif activation_function == "tanh":
-                    input_ = tf.nn.tanh(tf.matmul(input_, self.init_weights("w{}".format(i), [input_size, output_size])))
+                    input_ = tf.nn.tanh(
+                        tf.matmul(input_, self.init_weights("w{}".format(i), [input_size, output_size])))
                 elif activation_function == "lin":
                     input_ = tf.matmul(input_, self.init_weights("w{}".format(i), [input_size, output_size]))
                 elif activation_function == "leaky_relu":
@@ -93,29 +100,38 @@ class TensorNetwork:
 
 
 class KerasNetwork:
-    def __init__(self, state_size, action_size, hidden_sizes, layer_activation_functions, learning_rate, name='DQNetwork'):
-        self.state_size = state_size
-        self.action_size = action_size
-        self.learning_rate = learning_rate
-        self.hidden_sizes = hidden_sizes
-        self.layer_activation_functions = layer_activation_functions
+    def __init__(self, discount_factor, name='DQNetwork',
+                 model=None, state_size=None, action_size=None, hidden_sizes=None,
+                 hidden_activation_functions=None, output_activation_function=None):
         self.name = name
+        self.discount_factor = discount_factor
+        if model is not None:
+            self.model = load_model(model)
+        else:
+            try:
+                assert state_size is not None
+                assert action_size is not None
+                assert output_activation_function is not None
+            except AssertionError:
+                print("Network needs to know at least state_size, actionsize, and have an output_activation_function")
+            try:
+                if hidden_activation_functions is not None and hidden_sizes is not None:
+                    assert len(hidden_activation_functions) == len(hidden_sizes)
+            except AssertionError:
+                if len(hidden_activation_functions) > len(hidden_sizes):
+                    print("Too many hidden activation functions, must have length(hidden sizes) ")
+                else:
+                    print("Too few hidden activation functions, must have length(hidden sizes) ")
+                exit(1)
 
-        try:
-            assert len(self.layer_activation_functions) == len(self.hidden_sizes)+1
-        except AssertionError:
-            if len(self.layer_activation_functions) > len(self.hidden_sizes)+1:
-                print("Too many activation functions, must be length(hidden sizes) +1 ")
-            else:
-                print("Too few activation functions, must be length(hidden sizes) +1 ")
-            exit(1)
-
-        self.model = Sequential()
-        self.model.add(InputLayer(input_shape=(self.state_size,), batch_size=1))
-        # self.model.add(Dense(100, activation='tanh'))
-        # self.model.add(Dense(100, activation='tanh'))
-        self.model.add(Dense(self.action_size, activation='linear'))
-        self.model.compile(loss='mse', optimizer='adam', metrics=['mse'])
+            self.model = Sequential()
+            self.model.add(InputLayer(input_shape=(state_size,), batch_size=1))
+            inputs = np.roll(hidden_sizes, 1)
+            inputs[0] = state_size
+            for h, i, l in zip(hidden_sizes, inputs, hidden_activation_functions):
+                self.model.add(Dense(h, input_shape=(i,), activation=l))
+            self.model.add(Dense(action_size, input_shape=(state_size,), activation=output_activation_function))
+            self.model.compile(loss='mse', optimizer='adam', metrics=['mse'])
 
     def summary(self):
         return self.model.summary()
@@ -125,3 +141,10 @@ class KerasNetwork:
 
     def load(self, path):
         self.model = load_model(path)
+
+    def generate_target_vecs(self, states, actions, rewards, next_states, final_states):
+        targets = rewards
+        target_vecs = [self.model.predict(state.reshape((1, 52)))[0] for state in states]
+        for vec, action, target in zip(target_vecs, actions, targets):
+            vec[action] = target
+        return target_vecs

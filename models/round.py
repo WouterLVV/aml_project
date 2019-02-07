@@ -4,6 +4,50 @@ from models.deck import STANDARDDECK
 from models.suits import Suit
 
 
+class Round:
+    def __init__(self, players, deck=STANDARDDECK, trick_klass=Trick):
+        self.players = players
+        self.deck = deck
+        self.history = []
+        self.scores = [None]*4
+        self.lowest_clubs = deck.lowest_of_suit(Suit.CLUBS)
+        self.first_player = 0
+        self.trick_klass = trick_klass
+
+        hands = deck.deal(len(players), destructive=False)
+        for i, cards in enumerate(hands):
+            self.players[i].receive_hand(cards)
+
+    def play_trick(self, verbose=False, **kwargs):
+        trick = self.trick_klass(self.players, self.first_player, **kwargs)
+        trick.play()
+        self.first_player = trick.finish()
+        self.history.append(trick)
+        if verbose:
+            print("Starting player: " + str(trick.players[trick.first_player_id]) + ". -- Cards played: " + ", ".join(["{}: {}".format(trick.players[i].name, trick.cards[i]) for i in range(len(trick.players))]))
+        return trick
+
+    def winning_player(self):
+        return np.argmin(self.scores)
+
+    def losing_player(self):
+        return np.argmax(self.scores)
+
+    def finish(self, verbose=False):
+        for i, player in enumerate(self.players):
+            self.scores[i] = player.end_game()
+            if verbose:
+                print("{} got {} points!".format(player.name, self.scores[i]))
+            player.reset()
+
+    def play_round(self, verbose=False):
+        num_tricks = len(self.deck) // len(self.players)
+        for i in range(num_tricks):
+            self.play_trick(verbose=verbose)
+        self.finish(verbose=verbose)
+        return self
+
+
 class Hearts:
     def __init__(self, players, deck=STANDARDDECK):
         self.players = players
@@ -41,7 +85,7 @@ class Hearts:
             self.scores[i] = player.end_game()
             if verbose:
                 print("{} got {} points!".format(player.name, self.scores[i]))
-            player.reset(deck=self.deck)
+            player.reset()
 
     def play_game(self, verbose=False):
         num_tricks = len(self.deck) // len(self.players)

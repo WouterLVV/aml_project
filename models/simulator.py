@@ -1,4 +1,3 @@
-import tensorflow as tf
 import matplotlib.pyplot as plt
 import numpy as np
 import time
@@ -19,7 +18,7 @@ class Simulator:
         self.player_losses = [0]*len(players)
         self.player_wins = [0]*len(players)
         self.future_reward_factor = future_reward_factor
-        self.losses = []
+        self.losses = [[] for _ in range(len(players))]
         self.game_count = 0
         self.tensorflow_session = tensorflow_session
         self.data_transformer = data_transformer
@@ -69,7 +68,7 @@ class Simulator:
                                                       feed_dict={self.neural_network.inputs_: states,
                                                                  self.neural_network.target_Q: targets,
                                                                  self.neural_network.action_: actions})
-            self.losses.append(loss)
+                self.losses[i].append(loss)
 
     def collect_histories(self):
         history = []
@@ -135,40 +134,35 @@ class KerasSimulator(Simulator):
         for m in range(self.number_of_update_cycles):
             print("----------------- EPOCH {} -----------------".format(m))
             start_time = time.time()
+
             self.run_games()
             history = self.collect_histories()
             self.reset_games()
 
-            #print("Games are done")
             end_time = time.time()
-            t = end_time - start_time
-            #print("Time taken to simulate: {}".format(t))
-            # print("Combined scores: {}".format(totalscore))
+            print("Time taken to simulate epoch {}: {}".format(m, end_time - start_time))
 
-            for i in range(len(self.players)):
+            for i, player in enumerate(self.players):
                 states, actions, rewards, next_states, final_states = self.separate_history(history, player_id=i)
+
+                if hasattr(player, "neural_network"):
+                    target_vecs = player.neural_network.generate_target_vecs(states, actions, rewards, next_states, final_states)
+                else:
+                    target_vecs = self.neural_network.generate_target_vecs(states, actions, rewards, next_states, final_states)
+
+                loss = self.neural_network.model.fit(np.array(states), np.array(target_vecs), batch_size=1, epochs=1, verbose=False)
+                self.losses[i].append(loss.history['mean_squared_error'][0])
 
                 #targets = [r if True else r + self.update_rate * np.min(
                            # self.neural_network.model.predict(np.array(ns).reshape((1,52))))
                            # for (r, f, ns) in zip(rewards, final_states, next_states)]
-
-                targets = rewards
                 # target_vecs = [self.neural_network.model.predict(np.array([state])) for state in states ]
-                target_vecs = [self.neural_network.model.predict(state.reshape((1,52)))[0] for state in states ]
-                for vec, action, target in zip(target_vecs, actions, targets):
-                    vec[action] = target
-
-                loss = self.neural_network.model.fit(np.array(states), np.array(target_vecs), batch_size=1, epochs=1, verbose=False)
-                self.losses.append(loss)
-
                 # for s,a,r,ns,fs,t,tv in zip(states, actions, rewards, next_states, final_states, targets, target_vecs):
                 #     self.neural_network.model.fit(np.array(s).reshape((1,161)), np.array(tv).reshape((1,52)), epochs=1, verbose=False)
 
-            # self.losses.append(-1)
-            # sys.stdout.flush()
-
     def plot_losses(self):
-        plt.plot(range(len(self.losses)), [h.history['mean_squared_error'] for h in self.losses])
+        for i in range(len(self.players)):
+            plt.plot(range(len(self.losses[i])), self.losses[i])
         plt.title('Value loss function per cycle')
         plt.xlabel('Number of cycles')
         plt.ylabel('Value loss function')
